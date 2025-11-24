@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../devops_Practice"
+		},
+		{
+			"path": "../../ansible_Practice"
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
