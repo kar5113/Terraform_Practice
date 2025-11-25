@@ -1,0 +1,138 @@
+Terraform notes
+
+##### Terraform Variables
+1. Variables in Terraform can be defined using the `variable` block and can be referenced using `var.<variable_name>`.
+2. Variables can have default values, descriptions, and types (string, number, bool, list, map, etc.).
+3. Variables can be overridden using command-line flags, environment variables, or `.tfvars` files.
+4. Using variables enhances the reusability and flexibility of Terraform configurations.
+5. To get the variables input from the user during runtime, we can define variables without default values.
+Example:
+```hcl
+variable "sg_name" {
+  description = "Name of the security group"
+  type        = string
+}
+##
+using commmand line  example:
+terraform apply -var="sg_name=custom-sg" -var="sg_port=8080" -var='sg_cidr=["0.0.0.0/0"]'
+##
+using tfvars file example:
+Create a file named `custom.tfvars` with the following content:
+sg_name = "custom-sg"
+sg_port = 8080
+sg_cidr = ["0.0.0.0/0"]
+Then run:
+terraform apply -var-file="custom.tfvars"
+## 
+using environment variables example:
+Set environment variables with the `TF_VAR_` prefix:
+export TF_VAR_sg_name="custom-sg"
+export TF_VAR_sg_port=8080
+export TF_VAR_sg_cidr='["0.0.0.0/0"]'
+Then run:
+terraform apply 
+##
+the order of precedence for variable values is:
+1. Command-line flags
+2. Environment variables
+3. `.tfvars` files
+4. Default values in the configuration
+5. Prompted input during runtime
+
+#### Terraform conditions
+
+1. Terraform supports conditional expressions using the `condition ? true_value : false_value` syntax.
+2. Conditional expressions can be used to set variable values, resource attributes, and module inputs based on certain conditions.
+3. This allows for dynamic configurations that can adapt based on the environment or other factors.
+4. Conditional expressions can be nested for more complex logic.
+## Example:
+```hcl
+variable "environment" {
+  description = "The deployment environment"
+  type        = string
+  default     = "dev"
+}
+resource "aws_instance" "example" {
+  ami           = var.ami-id
+  instance_type = var.environment == "dev" ? "t3.micro" : "t3.large"
+  tags = {
+    Name = var.environment == "dev" ? "terraform-dev-instance" : "terraform-prod-instance"
+  }
+}
+```
+
+#### Terraform loops
+1. Terraform supports looping constructs using `for` expressions and `count` meta-argument.
+2. `for` expressions can be used to create lists or maps by iterating over collections.
+3. The `count` meta-argument allows for the creation of multiple instances of a resource based on a specified number.
+4. Loops enhance the ability to manage multiple similar resources efficiently.
+## Example using `count` expression:
+```hcl
+variable "instance_names" {
+  description = "List of instance names"
+  type        = list(string)
+  default     = ["instance1", "instance2", "instance3"]
+}
+resource "aws_instance" "example" {
+  count         = length(var.instance_names)
+  ami           = var.ami-id
+  instance_type = "t3.micro"
+  tags = {
+    Name = var.instance_names[count.index]
+  }
+}
+```
+## Example using `for` expression:
+```hcl
+variable "instance_ports" {
+  description = "List of instance ports"
+  type        = list(number)
+  default     = [80, 443, 8080]
+}
+resource "aws_security_group" "example" {
+  name        = "example-sg"
+  description = "Example security group"
+  vpc_id      = var.vpc-id  
+  ingress = [
+    for port in var.instance_ports : {
+      from_port   = port
+      to_port     = port
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ]
+  egress = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ]
+}
+```
+## Example for each loop:
+```hcl
+variable "instance_map" {
+  description = "Map of instance names to AMI IDs"
+  type        = map(string)
+  default     = {
+    "instance1" = "ami-0abcdef1234567890"
+    "instance2" = "ami-0abcdef1234567891"
+    "instance3" = "ami-0abcdef1234567892"
+  }
+}
+resource "aws_instance" "example" {
+  for_each      = var.instance_map
+  ami           = each.value
+  instance_type = "t3.micro"
+  tags = {
+    Name = each.key
+  }
+}
+```
+
+
+
+
+
