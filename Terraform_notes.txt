@@ -111,7 +111,7 @@ resource "aws_security_group" "example" {
   ]
 }
 ```
-## Example for each loop:
+## Example for each loop: it if for both map and set of strings
 ```hcl
 variable "instance_map" {
   description = "Map of instance names to AMI IDs"
