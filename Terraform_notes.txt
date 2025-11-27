@@ -132,6 +132,76 @@ resource "aws_instance" "example" {
 }
 ```
 
+#### Data Sources in Terraform
+1. Data sources in Terraform allow you to fetch and use information from external sources or existing infrastructure.
+2. They are defined using the `data` block and can reference various providers to retrieve data.
+3. Data sources are read-only and do not create or modify resources.
+4. They are useful for obtaining information such as AMI IDs, VPC details, or other resource attributes that are needed for resource creation.
+5. Data sources can be used to reference existing resources that were not created by the current Terraform configuration.
+## Example:
+```hcl
+data "aws_ami" "example" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+resource "aws_instance" "example" {
+  ami           = data.aws_ami.example.id
+  instance_type = "t3.micro"
+  tags = {
+    Name = "terraform-example-instance"
+  }
+}
+```
+
+
+#### Functions in Terraform
+1. Terraform provides a variety of built-in functions that can be used to manipulate data and perform operations within configurations.
+2. Functions can be used for string manipulation, numeric calculations, type conversions, collection operations, and more.
+3. Functions enhance the flexibility and dynamism of Terraform configurations by allowing for complex logic and data transformations.
+4. Functions are called using the syntax `function_name(arguments)`.
+5. Functions can be nested to perform multiple operations in a single expression.
+## Example:
+```hcl
+variable "instance_name" {
+  description = "Name of the instance"
+  type        = string
+  default     = "terraform-example-instance"
+}
+resource "aws_instance" "example" {
+  ami           = var.ami-id
+  instance_type = "t3.micro"
+  tags = {
+    Name = upper(var.instance_name)
+  }
+}
+```
+various commonly used functions:
+- `upper(string)`: Converts a string to uppercase. ex: upper("hello") => "HELLO"
+- `lower(string)`: Converts a string to lowercase. ex: lower("HELLO") => "hello"
+- `length(collection)`: Returns the length of a collection (list, map, string). ex: length(["a", "b", "c"]) => 3
+- `tolist(value)`: Converts a value to a list. ex: tolist("a,b,c") => ["a", "b", "c"]
+- `tomap(value)`: Converts a value to a map. ex: tomap({key1="value1", key2="value2"}) => {key1="value1", key2="value2"}
+- `tostring(value)`: Converts a value to a string. ex: tostring(123) => "123"
+- `join(separator, list)`: Joins a list of strings into a single string with the specified separator. ex: join("-", ["a", "b", "c"]) => "a-b-c"
+- `split(separator, string)`: Splits a string into a list of substrings based on the specified separator. ex: split("-", "a-b-c") => ["a", "b", "c"]
+- `lookup(map, key, default)`: Retrieves a value from a map by key, with an optional default if the key does not exist. ex: lookup({key1="value1", key2="value2"}, "key1", "default") => "value1"
+- `concat(list1, list2, ...)`: Concatenates multiple lists into a single list. ex: concat(["a", "b"], ["c", "d"]) => ["a", "b", "c", "d"]
+- `format(string, args...)`: Formats a string using the specified arguments.  ex: format("Hello, %s!", "World") => "Hello, World!"
+- `coalesce(value1, value2, ...)`: Returns the first non-null value from the provided arguments.  data "aws_ami" "ami" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
+
+
 
 
 
