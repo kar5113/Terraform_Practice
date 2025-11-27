@@ -1,4 +1,4 @@
-# resource "aws_instance" "roboshop" {
+# resource "aws_instance" "roboshop" { // for list
 #   count=length(var.instances)
 
 #   ami           = var.ami-id
@@ -35,7 +35,7 @@ resource "aws_instance" "roboshop" {
 
 
 
-# resource "aws_instance" "roboshop" {
+# resource "aws_instance" "roboshop" {. for set
 #   for_each = toset(var.instances)
 
 #   ami           = var.ami-id
