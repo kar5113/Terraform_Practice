@@ -16,9 +16,9 @@ resource "aws_instance" "Docker-roboshop" {
   ami           = "ami-09c813fb71547fc4f"
   instance_type = "t3.micro"
   security_groups= [aws_security_group.allow_all.name] 
-  root_block_device {
-    volume_size = 50
-  }
+  # root_block_device {
+  #   volume_size = 50
+  # }
   user_data = file("${path.module}/volume-change.sh")
 user_data_replace_on_change = true
   tags = {
