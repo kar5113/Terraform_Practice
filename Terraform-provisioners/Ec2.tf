@@ -15,8 +15,26 @@ resource "aws_instance" "example" {
     command = "rm -f inventory.ini"
     on_failure = continue
   }
+    provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y nginx",
+      "sudo systemctl start nginxs" 
+    ]
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file(var.ssh_private_key)
+      # or , key or password any one is necessary
+      password = "DevOps321"
+      host        = self.public_ip
+    }
+  }
   instance_initiated_shutdown_behavior = "terminate"
   
+}
+variable "ssh_private_key" {
+  default= "Path/for/private/key/file"
 }
 
 resource "aws_security_group" "allow_all" {
