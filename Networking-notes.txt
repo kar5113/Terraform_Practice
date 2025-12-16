@@ -37,14 +37,39 @@
 
        1. Create a VPC
        2. Create subnets (public and private)
-       3. Create an Internet Gateway and attach it to the VPC 
-       4. Create a route table for the public subnet and add a route to the Internet Gateway
-       5. Create a route table for the private subnet (no internet route) 
+       3. Create an Internet Gateway and attach it to the VPC  this is point 2
+       4. Create a route table for the public subnet(subnet assosiation) and add a route to the Internet Gateway
+       5. Create a route table for the private subnet(subnet assosiation) (no internet route) 
        6. Create a NAT Gateway in the public subnet
        7. Update the private subnet route table to add a route to the NAT Gateway for internet-bound traffic
+
+
+## VPC peering:
+- VPC Peering is a networking connection between two VPCs that enables you to route traffic between them using private IP addresses.
+- VPC Peering can be established between VPCs within the same AWS account or across different AWS accounts.
+- It allows resources in different VPCs to communicate with each other as if they were within the same network.
+- VPC Peering is a one-to-one relationship and does not support transitive peering, meaning that if VPC A is peered with VPC B, and VPC B is peered with VPC C, VPC A cannot communicate with VPC C through VPC B.
+- VPC Peering is useful for scenarios such as sharing resources between different environments (e.g., development and production) or connecting services across different business units.
+       - VPC A and VPC B should not have overlapping CIDR blocks.
+       - Route tables in both VPCs need to be updated to allow traffic to flow between the peered VPCs.
+       - Security groups and network ACLs should be configured to permit the desired traffic between the VPCs.
+
+       1. Create a VPC peering connection between the two VPCs.
+       2. Update the route tables in both VPCs to add routes that point to the peering connection for the respective CIDR blocks.
+              add the route in the route table of VPC A to point to VPC B's CIDR via the peering connection and vice versa.
+       3. Modify security groups and network ACLs to allow traffic between the peered VPCs as needed.
+       
+
+
+
+
+
+
+
 ### Summary:
 - VPCs, subnets, route tables, internet gateways, and NAT gateways are fundamental components of AWS networking that enable you to create secure and scalable cloud environments.
 - VPCs provide isolated virtual networks, while subnets allow for network segmentation.
 - Route tables control the flow of traffic within the VPC and to external networks.
 - Internet gateways facilitate internet connectivity for public subnets, and NAT gateways enable secure internet access for private subnets.
 - Together, these components allow you to design and implement robust networking architectures tailored to your application's needs.
+- VPC Peering enables seamless communication between different VPCs, enhancing resource sharing and collaboration across various environments.
