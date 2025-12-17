@@ -83,3 +83,9 @@ variable "nat_gateway_tags"{
     description = "A map of tags to assign to the NAT Gateway"
     default = {}
 }
+
+variable "is_peering_required"{
+    type= bool
+    description = "Boolean to indicate if VPC peering is required"
+    default = false
+}

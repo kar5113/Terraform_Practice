@@ -56,7 +56,7 @@
 
        1. Create a VPC peering connection between the two VPCs.
        2. Update the route tables in both VPCs to add routes that point to the peering connection for the respective CIDR blocks.
-              add the route in the route table of VPC A to point to VPC B's CIDR via the peering connection and vice versa.
+              add the route in the route table of VPC A to point to VPC B's CIDR via the peering connection and vice versa and only in required subnets.
        3. Modify security groups and network ACLs to allow traffic between the peered VPCs as needed.
        
 

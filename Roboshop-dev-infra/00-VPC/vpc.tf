@@ -1,5 +1,5 @@
 module "vpc"{
-    source ="../module"
+    source ="../../VPC/module"
     #if source is in git repo, then use below format
     #source="git::<repo_url>//path_to_module?ref=branch_name"
    
