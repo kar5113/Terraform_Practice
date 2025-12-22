@@ -52,4 +52,4 @@ Next procees with adding SG rules and creating database resources.
 ## 40-SG rules:
 This module adds necessary rules to the security groups created in 10-SG module.
 - Add a rule to allow ssh from internet or specific ip to bastion SG.
-- Add a rule to allow ssh from bastion SG to all other SGs.
+- Add a rule to allow ssh from bastion SG to all other SGs except frontend stuff.

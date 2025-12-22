@@ -20,10 +20,6 @@ resource "aws_security_group_rule" "frontend_alb-internet" {
   description       = "Allow HTTP traffic from internet to Frontend ALB"
 }
 
-# SG rule to allow http traffic from internet to frontend ALB on port 80
-
-# Security group rule to allow HTTPS traffic from backend alb to catalogue sg on port 80
-
 # Security group rule to allow ssh connection to bastion from internet
 resource "aws_security_group_rule" "bastion-internet" {
   type              = "ingress"
