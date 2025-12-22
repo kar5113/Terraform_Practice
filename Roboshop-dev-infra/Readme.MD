@@ -44,6 +44,8 @@ This bastion is used to configure the resources in private and database subnets.
 - Install terraform and ansible.
 - Bastion can be configured with either local exec or aws ec2 data source to run commands on the bastion itself.
 - The bastion's public ip is outputted to ssm parameter store for other modules to use.
+- create an iam role with necessary policies to allow the bastion to create resources in the account.(probably admin access for now)
+- Attach the iam role to the ec2 instance.
 
 Next procees with adding SG rules and creating database resources.
 

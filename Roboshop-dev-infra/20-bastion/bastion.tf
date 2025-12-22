@@ -7,16 +7,11 @@ resource "aws_instance" "example" {
     volume = 50
   }
 # Install terraform, ansible , git here
-user_data = <<-EOF
-              #!/bin/bash
-              growpart /dev/nvme0n1 4
-              lvextend -L +30G /dev/mapper/RootVG-varVol
-              xfs_growfs /var
-              sudo yum install -y yum-utils
-              sudo yum install -y terraform
-              sudo yum install -y git
-              sudo yum install -y ansible
-          EOF
+  user_data = file("${module.path}/configure.sh")
+
+#  Attach IAM Role to the EC2 Instance  
+  iam_instance_profile= aws_iam_instance_profile.Bastion_profile.name
+
 
   tags = merge(
         local.common_tags,{
@@ -24,3 +19,44 @@ user_data = <<-EOF
         }
     )
 }
+
+resource "aws_iam_role" "Bastion" {
+  name = "${var.project}-${var.environment}-bastion"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+
+  tags = merge(
+        local.common_tags,{
+            Name= "${local.common_name_suffix}-bastion-role"
+        }
+    )
+}
+
+resource "aws_iam_role_policy_attachment" "Bastion_attach" {
+  role       = aws_iam_role.Bastion.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+
+   
+}
+
+resource "aws_iam_instance_profile" "Bastion_profile" {
+  name = "${var.project}-${var.environment}-bastion-profile"
+  role = aws_iam_role.Bastion.name
+
+  depends_on = [aws_iam_role_policy_attachment.Bastion_attach]
+}
+
+

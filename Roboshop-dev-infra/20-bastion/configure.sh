@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Expanding the /var partition
+growpart /dev/nvme0n1 4
+
+# Extending the logical volume
+lvextend -L +30G /dev/mapper/RootVG-varVol
+
+# Resizing the filesystem
+xfs_growfs /var
+
+
+# Installing Terraform
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+sudo yum -y install terraform
+
+
+# Installing Ansible
+sudo dnf install ansible -y
+
+cd /home/ec2-user
+
+mkdir Roboshop
+
+# Installing Git
+sudo yum install git -y
+
+cd Roboshop
+
+# Cloning the Roboshop-dev-infra repository
+if [ ! -d Terraform_Practice ]; then
+  git clone https://github.com/kar5113/Terraform_Practice.git
+fi  
+
+cd /home/ec2-user/Roboshop
+
+# Cloning the Ansible_Roboshop repository
+if [ ! -d Ansible_Roboshop ]; then
+    git clone https://github.com/kar5113/Ansible_Practice.git
+fi
+
+
+
+
