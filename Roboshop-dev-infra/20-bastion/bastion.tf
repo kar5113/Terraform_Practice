@@ -3,33 +3,36 @@ resource "aws_instance" "example" {
   instance_type = "t3.micro"
   subnet_id = local.public_subnet_ids[0]
   vpc_security_group_ids = [local.bastion_sg_id]  
+
+# Install terraform, ansible , git here
+
   tags = merge(
         local.common_tags,{
             Name= "${local.common_name_suffix}-bastion"
         }
     )
 }
+# already a sg is created for bastion in 10-SG module
+# resource "aws_security_group" "allow_all" {
+#   name = "allow-all"
+#     description = "Allow all inbound traffic"
 
-resource "aws_security_group" "allow_all" {
-  name = "allow-all"
-    description = "Allow all inbound traffic"
+#     egress {
+#     from_port        = 0
+#     to_port          = 0
+#     protocol         = "-1"
+#     cidr_blocks      = ["0.0.0.0/0"]
 
-    egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+#   }
+#   ingress {
+#     from_port        = 0
+#     to_port          = 0
+#     protocol         = "-1"
+#     cidr_blocks      = ["0.0.0.0/0"]
 
-  }
-  ingress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+#   }
 
-  }
-
-  tags={
-    Name = "allow-all"
-  }
-}
+#   tags={
+#     Name = "allow-all"
+#   }
+# }

@@ -11,11 +11,11 @@ variable "environment" {
 }
 
 variable "sg_names"{
-  default= ["catalogue-sg","cart-sg","user-sg","shipping-sg","payment-sg",
+  default= ["catalogue","cart","user","shipping","payment",
   
-            "frontend-sg",
+            "frontend",
             
-            "mongodb-sg","mysql-sg","redis-sg","rabbitmq-sg","bastion-sg",
+            "mongodb","mysql","redis","rabbitmq","bastion",
             
-            "frontend-lb-sg"]
+            "frontend-alb", "backend-alb"]
 }

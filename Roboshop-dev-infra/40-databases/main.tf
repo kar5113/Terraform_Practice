@@ -1,0 +1,44 @@
+resource "aws_instance" "mongodb" {
+  ami           = local.ami_id
+  instance_type = "t3.micro"
+  subnet_id = local.database_subnet_ids[0]
+  vpc_security_group_ids = [local.mongodb_sg_id]  
+  tags = merge(
+        local.common_tags,{
+            Name= "${local.common_name_suffix}-mongodb"
+        }
+    )
+}
+
+## or this can be done using data in ec2 resource, refer docker ec2 creation file
+# or null resource
+resource "terraform_data" "bootstrap" {
+  triggers_replace = [
+    aws_instance.mongodb.id
+  ]
+
+  provisioner "remote-exec" {
+    inline = [ 
+      "chmod +X /tmp/bootstrap.sh",
+      "sudp sh ./tmp/bootstrap.sh"
+     ]
+  }
+# terraform copies the bootstrap.sh file from local to remote server
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/home/ec2-user/bootstrap.sh <db name>"
+  }
+
+  connection {
+    type        = "ssh"
+    host        = aws_instance.mongodb.private_ip
+    user        = "ec2-user"
+    private_key = "DevOps321"
+  }
+}
+
+
+
+# Do the same similarly for all the other db resources.
+# for my sql, create an iam role and policy for the incstance to access ssm parameter for mysql root pwd
+# attach the iam role to mysql ec2 instance

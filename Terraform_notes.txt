@@ -361,6 +361,38 @@ or Maintain different repos for each environment and modules to avoid code dupli
 
 
 
+### Null resource in terraform
+1. The `null_resource` in Terraform is a special resource type that does not create any actual infrastructure but can be used to trigger provisioners or manage dependencies.
+2. It is often used for running scripts, executing commands, or managing resources that are not directly supported by Terraform.
+3. The `null_resource` can be useful for tasks such as bootstrapping, configuration management, or orchestrating actions that need to occur during the Terraform lifecycle.
+4. It can be configured with provisioners like `local-exec` or `remote-exec` to run commands on the local machine or remote instances.
+5. The `null_resource` can also be used to create dependencies between resources by using the `depends_on` argument.
+## Example:
+```hcl
+resource "null_resource" "example" {
+  provisioner "local-exec" {
+    command = "echo 'Hello, World!' > hello.txt"
+  }
+}
+``` 
+
+Now null resource is deprecated, terraform-data is the new name to achieve the same functionality.
+
+
+## Terraform taint
+1. The `terraform taint` command is used to mark a specific resource as "tainted," indicating that it should be destroyed and recreated during the next `terraform apply`.
+2. Tainting a resource is useful when you want to force the recreation of a resource due to issues, configuration changes, or to ensure a fresh state.
+3. When a resource is tainted, Terraform will plan to destroy the existing resource and create a new one in its place.  
+4. The command requires the resource address as an argument to specify which resource to taint.
+5. After tainting a resource, you can run `terraform plan` to see the changes that will be made, followed by `terraform apply` to execute the plan and recreate the tainted resource.
+## Example:
+```bash
+terraform taint aws_instance.example
+```
+
+
+
+
 
 
 
