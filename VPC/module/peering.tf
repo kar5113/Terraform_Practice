@@ -1,4 +1,5 @@
 resource "aws_vpc_peering_connection" "this" {
+  # if this is set to true then peering connection is created.
   count= var.is_peering_required ? 1 : 0
   
        # AWS Account ID of the peer VPC
