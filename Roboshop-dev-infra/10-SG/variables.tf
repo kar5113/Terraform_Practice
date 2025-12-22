@@ -1,7 +1,7 @@
 variable "project" {
   description = "The name of the project"
   type        = string
-  default     = "Roboshop"
+  default     = "roboshop"
 }
 
 variable "environment" {
