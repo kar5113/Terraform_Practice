@@ -13,6 +13,12 @@ variable "environment" {
   type = string
 }
 
+
+variable "project" {
+  default = "roboshop"
+  type = string
+}
+
 variable "vpc_tags" {
   type = map
   default = {
