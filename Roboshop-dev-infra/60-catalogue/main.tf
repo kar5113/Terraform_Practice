@@ -2,14 +2,17 @@
 resource "aws_instance" "catalogue" {
   ami           = local.ami_id
   instance_type = "t3.micro"
-  subnet_id = local.private_subnet_id
-  vpc_security_group_ids = [local.catalogue_sg_id]  
+#   subnet_id = local.private_subnet_id
+#   vpc_security_group_ids = [local.catalogue_sg_id]  
+
+    # user_data = file("${path.module}/bootstrap.sh")
+    # user_data_replace_on_change = true
   tags = merge(
         local.common_tags,{
             Name= "${local.common_name_suffix}-catalogue"
         }
     )
-    associate_public_ip_address = false
+    # associate_public_ip_address = false
 }
 
 resource "aws_route53_record" "catalogue" {
@@ -17,7 +20,7 @@ resource "aws_route53_record" "catalogue" {
   name    = "catalogue-${var.environment}.${var.domain_name}"
   type    = "A"
   ttl     = 3
-  records = [aws_instance.catalogue.private_ip]
+  records = [aws_instance.catalogue.public_ip]
   allow_overwrite  = true
 }
 
@@ -34,16 +37,12 @@ resource "terraform_data" "bootstrap" {
   provisioner "remote-exec" {
     inline = [ 
       "chmod +x /tmp/bootstrap.sh",
-       "sudo sh /tmp/bootstrap.sh catalogue dev",
-       "cd /home/ec2-user/Roboshop-Ansible",
-       "sudo ansible-playbook -e component=catalogue -e env=dev main.yaml -i inventory.txt",
-       "curl http://localhost:8080/health",
-       "curl http://catalogue-dev.kardev.space:8080/health"
+       "sudo sh /tmp/bootstrap.sh catalogue dev"
      ]
   }
   connection {
     type        = "ssh"
-    host        = aws_instance.catalogue.private_ip
+    host        = aws_instance.catalogue.public_ip
     user        = "ec2-user"
     password = "DevOps321"
   }
