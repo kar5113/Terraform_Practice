@@ -131,7 +131,7 @@ resource "aws_security_group_rule" "catalogue-bastion" {
 }
 
 # catalogue from bastion http connection on port 80
-resource "aws_security_group_rule" "catalogue-bastion" {
+resource "aws_security_group_rule" "catalogue-bastion-http" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
