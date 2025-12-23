@@ -4,8 +4,7 @@ component=$1
 environment=$2
 
 dnf install ansible -y
-mkdir -p /var/log/roboshop/${component}/${environment}/
-touch ansible.log
+
 # Move into ansible script directory
 cd /home/ec2-user/
 
@@ -14,9 +13,9 @@ if [ ! -d Roboshop-Ansible ]; then
   git clone https://github.com/kar5113/Roboshop-Ansible.git
 fi
 
-cd Roboshop-Ansible
+cd /home/ec2-user/Roboshop-Ansible
 
 # Run the database ansible playbook
 
-#ansible-playbook -e component=${component} -e env=${environment} main.yaml -i inventory.txt
+ansible-playbook -e component=${component} -e env=${environment} main.yaml -i inventory.txt
 
