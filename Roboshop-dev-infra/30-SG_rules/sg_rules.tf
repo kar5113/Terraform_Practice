@@ -130,6 +130,17 @@ resource "aws_security_group_rule" "catalogue-bastion" {
   description       = "Allow Catalogue traffic from bastion to Catalogue SG"
 }
 
+# Allow catalogue to communicate with mongodb on port 27017
+resource "aws_security_group_rule" "mongodb-catalogue" {
+  type              = "ingress"
+  from_port         = 27017
+  to_port           = 27017
+  protocol          = "tcp"
+  source_security_group_id= local.catalogue_sg_id
+  security_group_id = local.mongodb_sg_id
+  description       = "Allow Catalogue SG to communicate with Mongodb SG"
+}
+
 
 
 
