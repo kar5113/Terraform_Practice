@@ -5,6 +5,9 @@ environment=$2
 
 dnf install ansible -y
 
+mkdir -p /var/log/roboshop/
+touch ansible.log
+
 # Move into ansible script directory
 cd /home/ec2-user/
 
@@ -17,5 +20,5 @@ cd /home/ec2-user/Roboshop-Ansible
 
 # Run the database ansible playbook
 
-ansible-playbook -e component=${component} -e env=${environment} main.yaml -i inventory.txt
+#ansible-playbook -e component=${component} -e env=${environment} main.yaml -i inventory.txt
 
