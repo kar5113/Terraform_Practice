@@ -34,14 +34,12 @@ resource "terraform_data" "bootstrap" {
   provisioner "remote-exec" {
     inline = [ 
       "chmod +x /tmp/bootstrap.sh",
-       "sudo sh /tmp/bootstrap.sh catalogue dev"
-      
+       "sudo sh /tmp/bootstrap.sh catalogue dev",
+       "sudo ansible-playbook -e component=catalogue -e env=dev main.yaml -i inventory.txt",
+       "curl http://localhost:8080/health",
+       "curl http://catalogue-dev.roboshop:8080/health"
      ]
   }
-
-
-  
-
   connection {
     type        = "ssh"
     host        = aws_instance.catalogue.private_ip
