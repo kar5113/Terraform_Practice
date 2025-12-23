@@ -24,6 +24,11 @@ resource "terraform_data" "bootstrap" {
   triggers_replace = [
     aws_instance.mongodb.id
   ]
+ # terraform copies the bootstrap.sh file from local to remote server
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "tmp/bootstrap.sh mongodb dev"
+  }
 
   provisioner "remote-exec" {
     inline = [ 
@@ -31,11 +36,7 @@ resource "terraform_data" "bootstrap" {
       "sudo sh ./tmp/bootstrap.sh"
      ]
   }
-  # terraform copies the bootstrap.sh file from local to remote server
-  provisioner "file" {
-    source      = "bootstrap.sh"
-    destination = "/home/ec2-user/bootstrap.sh mongodb dev"
-  }
+ 
 
   connection {
     type        = "ssh"
