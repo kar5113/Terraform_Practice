@@ -24,6 +24,11 @@ resource "terraform_data" "bootstrap" {
   triggers_replace = [
     aws_instance.catalogue.id
   ]
+  # terraform copies the bootstrap.sh file from local to remote server
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
 
   provisioner "remote-exec" {
     inline = [ 
@@ -31,11 +36,7 @@ resource "terraform_data" "bootstrap" {
       "sudo sh /tmp/bootstrap.sh catalogue dev"
      ]
   }
-  # terraform copies the bootstrap.sh file from local to remote server
-  provisioner "file" {
-    source      = "bootstrap.sh"
-    destination = "/tmp/bootstrap.sh"
-  }
+  
 
   connection {
     type        = "ssh"
