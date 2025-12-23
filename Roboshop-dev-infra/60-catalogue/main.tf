@@ -33,16 +33,12 @@ resource "terraform_data" "bootstrap" {
   provisioner "remote-exec" {
     inline = [ 
       "chmod +x /tmp/bootstrap.sh",
-       "sudo sh /tmp/bootstrap.sh catalogue dev",
-       "curl http://localhost:8080/health",
-       "curl http://catalogue-${var.environment}.${var.domain_name}:8080/health"
+       "sudo sh /tmp/bootstrap.sh catalogue dev"
+      
      ]
   }
 
-  provisioner "local-exec" {
-    command =  "curl http://catalogue-${var.environment}.${var.domain_name}/health"
-    
-  }
+
   
 
   connection {

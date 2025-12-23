@@ -18,6 +18,5 @@ cd Roboshop-Ansible
 
 # Run the database ansible playbook
 
-ansible-playbook -e component=${component} -e env=${environment} main.yaml -i inventory.txt
+#ansible-playbook -e component=${component} -e env=${environment} main.yaml -i inventory.txt
 
-curl http://localhost:8080/health
