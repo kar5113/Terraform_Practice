@@ -20,6 +20,32 @@ resource "aws_route53_record" "catalogue" {
   records = [aws_instance.catalogue.private_ip]
 }
 
+resource "terraform_data" "bootstrap" {
+  triggers_replace = [
+    aws_instance.catalogue.id
+  ]
+
+  provisioner "remote-exec" {
+    inline = [ 
+      "chmod +x /tmp/bootstrap.sh",
+      "sudo sh /tmp/bootstrap.sh catalogue dev"
+     ]
+  }
+  # terraform copies the bootstrap.sh file from local to remote server
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
+
+  connection {
+    type        = "ssh"
+    host        = aws_instance.catalogue.private_ip
+    user        = "ec2-user"
+    password = "DevOps321"
+  }
+}
+
+
 # stop the instance and create an ami from it.
 
 # Create a launch template using that ami
