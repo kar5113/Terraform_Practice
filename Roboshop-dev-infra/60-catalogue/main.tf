@@ -38,7 +38,7 @@ resource "terraform_data" "bootstrap" {
        "cd /home/ec2-user/Roboshop-Ansible",
        "sudo ansible-playbook -e component=catalogue -e env=dev main.yaml -i inventory.txt",
        "curl http://localhost:8080/health",
-       "curl http://catalogue-dev.roboshop:8080/health"
+       "curl http://catalogue-dev.kardev.space:8080/health"
      ]
   }
   connection {

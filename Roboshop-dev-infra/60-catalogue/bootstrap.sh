@@ -20,5 +20,5 @@ cd /home/ec2-user/Roboshop-Ansible
 
 # Run the database ansible playbook
 
-#ansible-playbook -e component=$component -e env=$environment main.yaml -i inventory.txt
+ansible-playbook -e component=$component -e env=$environment main.yaml -i inventory.txt
 
