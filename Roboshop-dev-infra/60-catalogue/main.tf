@@ -18,7 +18,7 @@ resource "aws_route53_record" "catalogue" {
   type    = "A"
   ttl     = 3
   records = [aws_instance.catalogue.private_ip]
-  overwrite = true
+  allow_overwrite  = true
 }
 
 resource "terraform_data" "bootstrap" {
