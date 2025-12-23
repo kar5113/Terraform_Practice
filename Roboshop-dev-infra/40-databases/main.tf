@@ -8,7 +8,6 @@ resource "aws_instance" "mongodb" {
             Name= "${local.common_name_suffix}-mongodb"
         }
     )
-
     associate_public_ip_address = false
 }
 
@@ -20,32 +19,31 @@ resource "aws_route53_record" "mongodb" {
   records = [aws_instance.mongodb.private_ip]
 }
 
-## or this can be done using data in ec2 resource, refer docker ec2 creation file
-# or null resource
-# resource "terraform_data" "bootstrap" {
-#   triggers_replace = [
-#     aws_instance.mongodb.id
-#   ]
+# or this can be done using data in ec2 resource, refer docker ec2 creation file or null resource
+resource "terraform_data" "bootstrap" {
+  triggers_replace = [
+    aws_instance.mongodb.id
+  ]
 
-#   provisioner "remote-exec" {
-#     inline = [ 
-#       "chmod +X /tmp/bootstrap.sh",
-#       "sudp sh ./tmp/bootstrap.sh"
-#      ]
-#   }
-#   # terraform copies the bootstrap.sh file from local to remote server
-#   provisioner "file" {
-#     source      = "bootstrap.sh"
-#     destination = "/home/ec2-user/bootstrap.sh <db name>"
-#   }
+  provisioner "remote-exec" {
+    inline = [ 
+      "chmod +X /tmp/bootstrap.sh",
+      "sudo sh ./tmp/bootstrap.sh"
+     ]
+  }
+  # terraform copies the bootstrap.sh file from local to remote server
+  provisioner "file" {
+    source      = "bootstrap.sh"
+    destination = "/home/ec2-user/bootstrap.sh mongodb dev"
+  }
 
-#   connection {
-#     type        = "ssh"
-#     host        = aws_instance.mongodb.private_ip
-#     user        = "ec2-user"
-#     private_key = "DevOps321"
-#   }
-# }
+  connection {
+    type        = "ssh"
+    host        = aws_instance.mongodb.private_ip
+    user        = "ec2-user"
+    private_key = "DevOps321"
+  }
+}
 
 
 
