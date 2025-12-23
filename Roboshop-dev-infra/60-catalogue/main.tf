@@ -34,8 +34,15 @@ resource "terraform_data" "bootstrap" {
     inline = [ 
       "chmod +x /tmp/bootstrap.sh",
        "sudo sh /tmp/bootstrap.sh catalogue dev",
-       "curl http://localhost:8080/health"
+       "curl http://localhost:8080/health",
+       "curl http://catalogue-${var.environment}.${var.domain_name}:8080/health"
      ]
+  }
+
+  provisioner "local-exec" {
+    inline= [
+        "curl http://catalogue-${var.environment}.${var.domain_name}/health"
+    ]
   }
   
 
