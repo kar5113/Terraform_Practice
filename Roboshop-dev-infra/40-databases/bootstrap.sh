@@ -4,6 +4,7 @@ component=$1
 environment=$2
 
 dnf install ansible -y
+
 mkdir -p /var/log/roboshop/${component}/${environment}/
 touch ansible.log
 # Move into ansible script directory
