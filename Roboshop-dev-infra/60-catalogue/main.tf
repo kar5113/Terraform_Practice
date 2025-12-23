@@ -40,9 +40,8 @@ resource "terraform_data" "bootstrap" {
   }
 
   provisioner "local-exec" {
-    inline= [
-        "curl http://catalogue-${var.environment}.${var.domain_name}/health"
-    ]
+    command =  "curl http://catalogue-${var.environment}.${var.domain_name}/health"
+    
   }
   
 
