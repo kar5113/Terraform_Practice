@@ -16,7 +16,7 @@ resource "aws_route53_record" "catalogue" {
   zone_id = "Z0806995L2997E89SFOF"
   name    = "catalogue-${var.environment}.${var.domain_name}"
   type    = "A"
-  ttl     = 30
+  ttl     = 3
   records = [aws_instance.catalogue.private_ip]
 }
 
