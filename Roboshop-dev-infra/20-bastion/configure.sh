@@ -7,7 +7,7 @@ growpart /dev/nvme0n1 4
 lvextend -L +30G /dev/mapper/RootVG-homeVol
 
 # Resizing the filesystem
-xfs_growfs /var
+xfs_growfs /home
 
 
 # Installing Terraform
