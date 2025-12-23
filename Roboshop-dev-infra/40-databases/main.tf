@@ -27,13 +27,13 @@ resource "terraform_data" "bootstrap" {
  # terraform copies the bootstrap.sh file from local to remote server
   provisioner "file" {
     source      = "bootstrap.sh"
-    destination = "tmp/bootstrap.sh mongodb dev"
+    destination = "/tmp/bootstrap.sh"
   }
 
   provisioner "remote-exec" {
     inline = [ 
       "chmod +X /tmp/bootstrap.sh",
-      "sudo sh ./tmp/bootstrap.sh"
+      "sudo sh ./tmp/bootstrap.sh mongodb dev"
      ]
   }
  
