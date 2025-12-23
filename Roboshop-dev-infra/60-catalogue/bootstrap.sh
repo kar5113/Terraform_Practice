@@ -25,6 +25,10 @@ echo ${environment}
 
 ansible-playbook -e component=$component -e env=$environment main.yaml -i inventory.txt 
 
+systemctl status catalogue
+
+systemctl restart sshd
+
 
 
 
