@@ -1,5 +1,6 @@
 # create ec2 instance and configure it similar to databases.
 
+
 # stop the instance and create an ami from it.
 
 # Create a launch template using that ami

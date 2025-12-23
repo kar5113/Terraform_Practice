@@ -4,7 +4,7 @@
 growpart /dev/nvme0n1 4
 
 # Extending the logical volume
-lvextend -L +30G /dev/mapper/RootVG-varVol
+lvextend -L +30G /dev/mapper/RootVG-homeVol
 
 # Resizing the filesystem
 xfs_growfs /var
@@ -37,7 +37,7 @@ cd /home/ec2-user/Roboshop
 
 # Cloning the Ansible_Roboshop repository
 if [ ! -d Ansible_Roboshop ]; then
-    git clone https://github.com/kar5113/Ansible_Practice.git
+    git clone https://github.com/kar5113/Roboshop-Ansible.git
 fi
 
 

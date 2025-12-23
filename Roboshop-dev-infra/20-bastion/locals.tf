@@ -1,4 +1,4 @@
-local{
+locals{
     ami_id=data.aws_ami.ami.id
     bastion_sg_id=data.aws_ssm_parameter.bastion_sg.value
     common_tags={
@@ -6,7 +6,7 @@ local{
         Environment=var.environment
     }
     common_name_suffix="${var.project}-${var.environment}"
-    public_subnet_ids=split(data.aws_ssm_parameter.public_subnet_ids.value,",")
-    private_subnet_ids=split(data.aws_ssm_parameter.private_subnet_ids.value,",")
-    database_subnet_ids=split(data.aws_ssm_parameter.database_subnet_ids.value,",")
+    public_subnet_id=split(",",data.aws_ssm_parameter.public_subnet_ids.value)[0]
+    # private_subnet_ids=split(data.aws_ssm_parameter.private_subnet_ids.value,",")
+    # database_subnet_ids=split(data.aws_ssm_parameter.database_subnet_ids.value,",")
 }

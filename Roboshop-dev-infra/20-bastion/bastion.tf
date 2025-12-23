@@ -1,13 +1,13 @@
-resource "aws_instance" "example" {
+resource "aws_instance" "bastion" {
   ami           = local.ami_id
   instance_type = "t3.micro"
-  subnet_id = local.public_subnet_ids[0]
+  subnet_id = local.public_subnet_id
   vpc_security_group_ids = [local.bastion_sg_id]  
   root_block_device {
-    volume = 50
+    volume_size = 50
   }
 # Install terraform, ansible , git here
-  user_data = file("${module.path}/configure.sh")
+  user_data = file("${path.module}/configure.sh")
 
 #  Attach IAM Role to the EC2 Instance  
   iam_instance_profile= aws_iam_instance_profile.Bastion_profile.name

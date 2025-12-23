@@ -47,9 +47,20 @@ This bastion is used to configure the resources in private and database subnets.
 - create an iam role with necessary policies to allow the bastion to create resources in the account.(probably admin access for now)
 - Attach the iam role to the ec2 instance.
 
-Next procees with adding SG rules and creating database resources.
+Next process with adding SG rules and creating database resources.
 
-## 40-SG rules:
+## 30-SG rules:
 This module adds necessary rules to the security groups created in 10-SG module.
 - Add a rule to allow ssh from internet or specific ip to bastion SG.
 - Add a rule to allow ssh from bastion SG to all other SGs except frontend stuff.
+
+
+
+## 40-Databases:
+This module creates all the database resources required for the Roboshop application.
+- Create a mongodb instance in database subnet.
+- Create a mysql instance in database subnet.
+- Create a redis cluster in database subnet.
+- Create a rabbitmq instance in database subnet.
+
+

@@ -1,41 +1,51 @@
 resource "aws_instance" "mongodb" {
   ami           = local.ami_id
   instance_type = "t3.micro"
-  subnet_id = local.database_subnet_ids[0]
+  subnet_id = local.database_subnet_id
   vpc_security_group_ids = [local.mongodb_sg_id]  
   tags = merge(
         local.common_tags,{
             Name= "${local.common_name_suffix}-mongodb"
         }
     )
+
+    associate_public_ip_address = false
+}
+
+resource "aws_route53_record" "mongodb" {
+  zone_id = "Z0806995L2997E89SFOF"
+  name    = "mongodb.${var.domain_name}"
+  type    = "A"
+  ttl     = 30
+  records = [aws_instance.mongodb.private_ip]
 }
 
 ## or this can be done using data in ec2 resource, refer docker ec2 creation file
 # or null resource
-resource "terraform_data" "bootstrap" {
-  triggers_replace = [
-    aws_instance.mongodb.id
-  ]
+# resource "terraform_data" "bootstrap" {
+#   triggers_replace = [
+#     aws_instance.mongodb.id
+#   ]
 
-  provisioner "remote-exec" {
-    inline = [ 
-      "chmod +X /tmp/bootstrap.sh",
-      "sudp sh ./tmp/bootstrap.sh"
-     ]
-  }
-# terraform copies the bootstrap.sh file from local to remote server
-  provisioner "file" {
-    source      = "bootstrap.sh"
-    destination = "/home/ec2-user/bootstrap.sh <db name>"
-  }
+#   provisioner "remote-exec" {
+#     inline = [ 
+#       "chmod +X /tmp/bootstrap.sh",
+#       "sudp sh ./tmp/bootstrap.sh"
+#      ]
+#   }
+#   # terraform copies the bootstrap.sh file from local to remote server
+#   provisioner "file" {
+#     source      = "bootstrap.sh"
+#     destination = "/home/ec2-user/bootstrap.sh <db name>"
+#   }
 
-  connection {
-    type        = "ssh"
-    host        = aws_instance.mongodb.private_ip
-    user        = "ec2-user"
-    private_key = "DevOps321"
-  }
-}
+#   connection {
+#     type        = "ssh"
+#     host        = aws_instance.mongodb.private_ip
+#     user        = "ec2-user"
+#     private_key = "DevOps321"
+#   }
+# }
 
 
 

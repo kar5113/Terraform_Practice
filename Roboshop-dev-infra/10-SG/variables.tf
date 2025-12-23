@@ -17,5 +17,5 @@ variable "sg_names"{
             
             "mongodb","mysql","redis","rabbitmq","bastion",
             
-            "frontend-alb", "backend-alb"]
+            "frontend_alb", "backend_alb"]
 }

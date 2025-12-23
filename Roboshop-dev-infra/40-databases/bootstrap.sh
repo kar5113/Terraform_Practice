@@ -1,8 +1,14 @@
 #!/bin/bash
 
+component=$1
+environment=$2
 
-dnf install -y ansible
 
+mkdir -p /var/log/roboshop/${component}/${environment}/
+touch ansible.log
+# Move into ansible script directory
+cd /home/ec2-user/Roboshop/Roboshop-Ansible
 
-#for this, create a another repo of ansible roles folder and replace the host with localhost for all
-ansible-pull -U <git repository url> -i localhost, <path to $1.yaml file>
+# Run the database ansible playbook
+
+ansible-playbook -e component=${component} -e env=${environment} main.yaml
