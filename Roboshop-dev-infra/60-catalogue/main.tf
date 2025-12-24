@@ -5,8 +5,9 @@ resource "aws_instance" "catalogue" {
   subnet_id = local.private_subnet_id
   vpc_security_group_ids = [local.catalogue_sg_id]  
 
-    user_data = file("${path.module}/bootstrap.sh")
-    user_data_replace_on_change = true
+    # Doesnt work properly, its inconsisitent. Works sometimes and fails sometimes. Keep it as example placeholder.
+    # user_data = file("${path.module}/bootstrap.sh")
+    # user_data_replace_on_change = true
   tags = merge(
         local.common_tags,{
             Name= "${local.common_name_suffix}-catalogue"
