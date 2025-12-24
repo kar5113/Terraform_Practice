@@ -29,6 +29,8 @@ systemctl status catalogue
 
 systemctl restart sshd
 
+exit 0
+
 
 
 
