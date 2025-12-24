@@ -59,7 +59,7 @@ resource "aws_ec2_instance_state" "stop_catalogue" {
 
 # create an ami using the stopped instance
 resource "aws_ami_from_instance" "catalogue_ami" {
-  name               = "catalogue-ami-${var.environment}-${date("YYYYMMDDHHMM")}"
+  name               = "catalogue-ami-${var.environment}-${timestamp()}"
   source_instance_id = aws_instance.catalogue.id
 }
 
@@ -83,6 +83,8 @@ resource "aws_launch_template" "catalogue_launch_template" {
     )
   }
 }
+
+# create a target group for catalogue service
 
 
 
