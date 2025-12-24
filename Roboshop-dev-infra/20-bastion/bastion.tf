@@ -20,6 +20,15 @@ resource "aws_instance" "bastion" {
     )
 }
 
+resource "aws_route53_record" "bastion" {
+  zone_id = "Z0806995L2997E89SFOF"
+  name    = "bastion-${var.environment}.${var.domain_name}"
+  type    = "A"
+  ttl     = 3
+  records = [aws_instance.bastion.public_ip]
+  allow_overwrite  = true
+}
+
 resource "aws_iam_role" "Bastion" {
   name = "${var.project}-${var.environment}-bastion"
 

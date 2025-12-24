@@ -11,3 +11,9 @@ variable "environment" {
     default     = "dev"
   
 }
+
+variable "domain_name" {
+    description = "The domain name for Route53 records"
+    type        = string
+    default="kardev.space"
+}

@@ -13,7 +13,7 @@ resource "aws_instance" "catalogue" {
             Name= "${local.common_name_suffix}-catalogue"
         }
     )
-    # associate_public_ip_address = false
+     associate_public_ip_address = false
 }
 
 resource "aws_route53_record" "catalogue" {
@@ -21,7 +21,7 @@ resource "aws_route53_record" "catalogue" {
   name    = "catalogue-${var.environment}.${var.domain_name}"
   type    = "A"
   ttl     = 3
-  records = [aws_instance.catalogue.public_ip]
+  records = [aws_instance.catalogue.private_ip]
   allow_overwrite  = true
 }
 
@@ -43,7 +43,7 @@ resource "terraform_data" "bootstrap" {
   }
   connection {
     type        = "ssh"
-    host        = aws_instance.catalogue.public_ip
+    host        = aws_instance.catalogue.private_ip
     user        = "ec2-user"
     password = "DevOps321"
   }
