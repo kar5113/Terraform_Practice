@@ -156,23 +156,47 @@ resource "aws_autoscaling_group" "catalogue" {
 
   capacity_distribution_strategy = "balanced-best-effort"
 
-  
+  target_group_arns = [aws_lb_target_group.catalogue.arn]
 
-
-  tag {
-    key                 = "foo"
-    value               = "bar"
-    propagate_at_launch = true
+    instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+    triggers = ["launch_template"]
   }
 
+   dynamic "tag" {
+    for_each = merge(
+      local.common_tags,
+      {
+        Name = "${local.common_name_suffix}-catalogue"
+      }
+    )
+    content {
+      key                 = tag.key
+      propagate_at_launch = true
+      value               = tag.value
+    }
+  }
   timeouts {
     delete = "15m"
   }
+}
 
-  tag {
-    key                 = "lorem"
-    value               = "ipsum"
-    propagate_at_launch = false
+resource "aws_autoscaling_policy" "catalogue" {
+  name                   = "${local.common_name_suffix}-catalogue-scale-out"
+ 
+  autoscaling_group_name = aws_autoscaling_group.catalogue.name
+
+  policy_type = "TargetTrackingScaling"
+
+   target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+
+    target_value = 85.0
   }
 }
 
