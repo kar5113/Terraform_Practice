@@ -27,7 +27,6 @@ ansible-playbook -e component=$component -e env=$environment main.yaml -i invent
 
 systemctl status catalogue
 
-systemctl restart sshd
 
 exit 0
 
