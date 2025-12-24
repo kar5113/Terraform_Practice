@@ -45,7 +45,7 @@ resource "terraform_data" "bootstrap" {
     type        = "ssh"
     host        = aws_instance.catalogue.private_ip
     user        = "ec2-user"
-    password = "DevOps321"
+    password    = "DevOps321"
   }
 }
 
