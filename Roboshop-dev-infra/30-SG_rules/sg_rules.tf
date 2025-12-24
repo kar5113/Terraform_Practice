@@ -141,6 +141,29 @@ resource "aws_security_group_rule" "catalogue-bastion-http" {
   description       = "Allow Catalogue traffic from bastion to Catalogue SG"
 }
 
+# catalogue from backend alb http connection on port 80
+resource "aws_security_group_rule" "catalogue-bastion-http" {
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  source_security_group_id= local.backend_alb_sg_id
+  security_group_id = local.catalogue_sg_id
+  description       = "Allow Catalogue traffic from backend alb to Catalogue SG"
+}
+
+
+
+
+resource "aws_security_group_rule" "backend-bastion-http" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  source_security_group_id= local.bastion_sg_id
+  security_group_id = local.backend_alb_sg_id
+  description       = "Allow http traffic from bastion to Backend ALB SG"
+}
 
 
 # Allow catalogue to communicate with mongodb on port 27017
