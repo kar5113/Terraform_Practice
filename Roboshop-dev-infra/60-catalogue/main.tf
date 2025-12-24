@@ -27,7 +27,7 @@ resource "aws_route53_record" "catalogue" {
 }
 
 # bootstrap the catalogue service using terraform provisioners
-resource "terraform_data" "bootstrap" {
+resource "terraform_data" "catalogue" {
   triggers_replace = [
     aws_instance.catalogue.id
   ]
@@ -52,35 +52,127 @@ resource "terraform_data" "bootstrap" {
 }
 
 # stop the instance
-resource "aws_ec2_instance_state" "stop_catalogue" {
+resource "aws_ec2_instance_state" "catalogue" {
   instance_id = aws_instance.catalogue.id
   state       = "stopped"
+  depends_on = [ terraform_data.catalogue ] 
 }
 
 # create an ami using the stopped instance
-resource "aws_ami_from_instance" "catalogue_ami" {
+resource "aws_ami_from_instance" "catalogue" {
   name               = "catalogue-ami-${var.environment}-${timestamp()}"
   source_instance_id = aws_instance.catalogue.id
+  depends_on = [ aws_ec2_instance_state.catalogue ]
 }
 
 # create a launch template using that ami
-resource "aws_launch_template" "catalogue_launch_template" {
-  name = "catalogue-${var.environment}"
-  image_id = aws_ami_from_instance.catalogue_ami.id
+resource "aws_launch_template" "catalogue" {
+  name = "${local.common_name_suffix}-catalogue"
+
+  image_id = aws_ami_from_instance.catalogue.id
+
   instance_type = "t3.micro"
-  placement {
-    availability_zone = local.private_subnet_id
-  }
+ 
+  instance_initiated_shutdown_behavior = "terminate"
+
   vpc_security_group_ids = [local.catalogue_sg_id]
 
+  # when we run terraform apply again, a new version will be created with new AMI ID
+  update_default_version = true
+
+  # tags for the launch template resource
   tag_specifications {
-   resource_type = "catalogue-${var.environment}-instance-template"
+   resource_type = "instance"
 
     tags =  merge(
         local.common_tags,{
             Name= "${local.common_name_suffix}-catalogue-launch-template"
         }
     )
+  }
+
+  #tags for the volumes created using this launch template
+  tag_specifications {
+    resource_type = "volume"
+
+    tags = merge(
+      local.common_tags,
+      {
+        Name = "${local.common_name_suffix}-catalogue"
+      }
+    )
+  }
+
+    tags = merge(
+      local.common_tags,
+      {
+        Name = "${local.common_name_suffix}-catalogue"
+      }
+    )
+}
+
+# create a target group for catalogue service
+resource "aws_lb_target_group" "catalogue" {
+  name        = "${local.common_name_suffix}-catalogue-tg"
+  target_type = "alb"
+  port        = 8080
+  protocol    = "HTTP"
+  protocol_version = "HTTP1"
+  ip_address_type= "ipv4"
+  vpc_id      = local.vpc_id
+  deregistration_delay = 60 # waiting period before deleting the instance
+
+
+    health_check {
+        # Defaults to true
+        enabled = true
+        protocol = "HTTP"
+        path = "/health"
+        port = "8080"
+        timeout = 3
+        healthy_threshold = 2
+        unhealthy_threshold = 5
+        interval = 10
+        matcher = "200-299"
+    }
+}
+
+# Autoscaling group for catalogue service
+resource "aws_autoscaling_group" "catalogue" {
+  name                      = "${local.common_name_suffix}-catalogue-asg"
+  max_size                  = 2
+  min_size                  = 1
+  health_check_grace_period = 120
+  health_check_type         = "ELB"
+  desired_capacity          = 1
+  force_delete              = false
+
+  launch_template {
+    id      = aws_launch_template.catalogue.id
+    version = aws_launch_template.catalogue.latest_version
+  }
+
+  vpc_zone_identifier = local.private_subnet_id
+
+  capacity_distribution_strategy = "balanced-best-effort"
+
+  
+
+
+  tag {
+    key                 = "foo"
+    value               = "bar"
+    propagate_at_launch = true
+  }
+
+  timeouts {
+    delete = "15m"
+  }
+
+  tag {
+    key                 = "lorem"
+    value               = "ipsum"
+    propagate_at_launch = false
   }
 }
 
