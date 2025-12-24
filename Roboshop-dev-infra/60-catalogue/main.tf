@@ -114,7 +114,7 @@ resource "aws_launch_template" "catalogue" {
 # create a target group for catalogue service
 resource "aws_lb_target_group" "catalogue" {
   name        = "${local.common_name_suffix}-catalogue-tg"
-  target_type = "alb"
+  target_type = "instance" # default
   port        = 8080
   protocol    = "HTTP"
   protocol_version = "HTTP1"
