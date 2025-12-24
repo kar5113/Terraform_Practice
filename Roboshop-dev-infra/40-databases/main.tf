@@ -17,6 +17,7 @@ resource "aws_route53_record" "mongodb" {
   type    = "A"
   ttl     = 30
   records = [aws_instance.mongodb.private_ip]
+  allow_overwrite = true
 }
 
 # or this can be done using data in ec2 resource, refer docker ec2 creation file or null resource
