@@ -200,7 +200,7 @@ resource "aws_autoscaling_policy" "catalogue" {
 }
 
 # create a lb listener policy
-resource "aws_lb_listener" "front_end" {
+resource "aws_lb_listener_rule" "catalogue" {
   load_balancer_arn = local.backend_alb_arn
   priority = 10
 
