@@ -201,10 +201,10 @@ resource "aws_autoscaling_policy" "catalogue" {
 
 # create a lb listener policy
 resource "aws_lb_listener_rule" "catalogue" {
-  load_balancer_arn = local.backend_alb_arn
+  listener_arn= local.backend_alb_arn
   priority = 10
 
-  default_action {
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.catalogue.arn
   }
