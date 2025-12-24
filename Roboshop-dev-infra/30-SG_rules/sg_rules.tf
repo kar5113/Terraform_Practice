@@ -142,7 +142,7 @@ resource "aws_security_group_rule" "catalogue-bastion-http" {
 }
 
 # catalogue from backend alb http connection on port 80
-resource "aws_security_group_rule" "catalogue-bastion-http" {
+resource "aws_security_group_rule" "catalogue-backend-alb-http" {
   type              = "ingress"
   from_port         = 8080
   to_port           = 8080
