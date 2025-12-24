@@ -152,9 +152,8 @@ resource "aws_autoscaling_group" "catalogue" {
     version = aws_launch_template.catalogue.latest_version
   }
 
-  vpc_zone_identifier = local.private_subnet_id
+  vpc_zone_identifier = local.private_subnet_ids
 
-  capacity_distribution_strategy = "balanced-best-effort"
 
   target_group_arns = [aws_lb_target_group.catalogue.arn]
 
