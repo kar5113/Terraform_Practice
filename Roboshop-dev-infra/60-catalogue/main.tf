@@ -74,7 +74,7 @@ resource "aws_launch_template" "catalogue_launch_template" {
   vpc_security_group_ids = [local.catalogue_sg_id]
 
   tag_specifications {
-    service = "catalogue-${var.environment}"
+   resource_type = "catalogue-${var.environment}-instance-template"
 
     tags =  merge(
         local.common_tags,{
