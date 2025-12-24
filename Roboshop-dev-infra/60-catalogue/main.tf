@@ -66,7 +66,7 @@ resource "aws_ami_from_instance" "catalogue_ami" {
 # create a launch template using that ami
 resource "aws_launch_template" "catalogue_launch_template" {
   name = "catalogue-${var.environment}"
-  image_id = aws_ami_from_instance
+  image_id = aws_ami_from_instance.catalogue_ami.id
   instance_type = "t3.micro"
   placement {
     availability_zone = local.private_subnet_id
