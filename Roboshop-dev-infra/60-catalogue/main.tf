@@ -200,17 +200,32 @@ resource "aws_autoscaling_policy" "catalogue" {
   }
 }
 
-# create a lb ;listener policy
+# create a lb listener policy
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = local.backend_alb_arn
-  port              = "8080"
-  protocol          = "HTTP"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  priority = 10
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.front_end.arn
+  }
+
+  condition {
+    host_header {
+        values = ["catalogue-backend-alb-${var.environment}.${var.domain_name}"]
+    }
+  }
+}
+
+# remove the originally created instance
+resource "terraform_data" "catalogue_local" {
+  triggers_replace = [
+    aws_instance.catalogue.id
+  ]
+  
+  depends_on = [aws_autoscaling_policy.catalogue]
+  provisioner "local-exec" {
+    command = "aws ec2 terminate-instances --instance-ids ${aws_instance.catalogue.id}"
   }
 }
 
