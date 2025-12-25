@@ -25,3 +25,12 @@ host = $1
  done
     echo "Terraform applied in all directories successfully"
 
+
+# Alternative way without loop
+# for i in 00-VPC 10-SG 20-bastion 30-SG_rules 50-Backend-alb 70-acm 80-frontend-alb; do
+#    echo "Entering into directory: $i"
+#    cd $i
+#    terraform apply -auto-approve 
+#    cd ..
+# done    
+
