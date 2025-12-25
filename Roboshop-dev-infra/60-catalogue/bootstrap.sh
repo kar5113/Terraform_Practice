@@ -25,6 +25,12 @@ echo ${environment}
 
 ansible-playbook -e component=$component -e env=$environment main.yaml -i inventory.txt 
 
+sudo yum reinstall openssh-server -y
+
+sudo systemctl restart sshd
+
+sleep 5
+
 exit 0
 
 
