@@ -10,10 +10,18 @@ touch ansible.log
 # Move into ansible script directory
 cd /home/ec2-user/
 
-# clone the repository if not already present
-if [ ! -d Roboshop-Ansible ]; then
+# clone the repository if not already present, if present pull the latest changes
+if [ -d Roboshop-Ansible ]; then
+  cd Roboshop-Ansible
+  git pull
+else
   git clone https://github.com/kar5113/Roboshop-Ansible.git
-fi
+fi  
+
+# # clone the repository if not already present
+# if [ ! -d Roboshop-Ansible ]; then
+#   git clone https://github.com/kar5113/Roboshop-Ansible.git
+# fi
 
 cd Roboshop-Ansible
 
