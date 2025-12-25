@@ -157,6 +157,7 @@ resource "aws_autoscaling_group" "catalogue" {
 
   target_group_arns = [aws_lb_target_group.catalogue.arn]
 
+    # When the launch template is updated with new ami, this will trigger rolling update
     instance_refresh {
     strategy = "Rolling"
     preferences {
