@@ -25,5 +25,5 @@ data "aws_ssm_parameter" "backend_alb_arn" {
 }
 
 data "aws_ssm_parameter" "frontend_alb_arn" {
-  name = "/${var.project}/${var.environment}/frontendalb_arn"
+  name = "/${var.project}/${var.environment}/frontendlb_arn"
 }
