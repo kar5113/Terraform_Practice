@@ -30,11 +30,10 @@ ansible-playbook -e component=$component -e env=$environment main.yaml -i invent
 sudo dnf update -y openssl\* openssh\*
 
 
-# sudo yum reinstall openssh-server -y
+ sudo yum reinstall openssh-server -y
 
 sudo systemctl restart sshd
 
-sudo lsof -i :22
 
 sudo sshd -t
 sudo journalctl -xeu sshd >> /tmp/sshd-error.log
