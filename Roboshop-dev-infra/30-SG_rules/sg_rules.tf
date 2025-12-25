@@ -294,47 +294,36 @@ resource "aws_security_group_rule" "rabbitmq-payment" {
 
 ######################################################################################################################################################
 
-# Allow cart to communicate with catalogue on port 8080
-resource "aws_security_group_rule" "catalogue-cart" {
+# Allow shipping to communicate with cart via backend alb on port 80
+resource "aws_security_group_rule" "backendlb_cart-shipping" {
   type              = "ingress"
-  from_port         = 8080
-  to_port           = 8080
-  protocol          = "tcp"
-  source_security_group_id= local.cart_sg_id
-  security_group_id = local.catalogue_sg_id
-  description       = "Allow Cart SG to communicate with Catalogue SG"
-}
-
-# Allow shipping to communicate with cart on port 8080
-resource "aws_security_group_rule" "cart-shipping" {
-  type              = "ingress"
-  from_port         = 8080
-  to_port           = 8080
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   source_security_group_id= local.shipping_sg_id
-  security_group_id = local.cart_sg_id
+  security_group_id = local.backend_alb_sg_id
   description       = "Allow Shipping SG to communicate with Cart SG"
 }
 
-# Allow payment to communicate with user on port 8080
-resource "aws_security_group_rule" "user-payment" {
+# Allow cart to communicate with catalogue via backend alb on port 80
+resource "aws_security_group_rule" "backendlb_cart-catalogue" {
   type              = "ingress"
-  from_port         = 8080
-  to_port           = 8080
-  protocol          = "tcp"
-  source_security_group_id= local.user_sg_id
-  security_group_id = local.payment_sg_id
-  description       = "Allow User SG to communicate with Payment SG"
-}
-
-# Allow payment to communicate with cart on port 8080
-resource "aws_security_group_rule" "cart-payment" {
-  type              = "ingress"
-  from_port         = 8080
-  to_port           = 8080
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   source_security_group_id= local.cart_sg_id
-  security_group_id = local.payment_sg_id
+  security_group_id = local.backend_alb_sg_id
+  description       = "Allow Cart SG to communicate with Payment SG"
+}
+
+# Allow payment to communicate with cart,user via backend alb on port 80
+resource "aws_security_group_rule" "backendlb_cart-payment" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  source_security_group_id= local.payment_sg_id
+  security_group_id = local.backend_alb_sg_id
   description       = "Allow Cart SG to communicate with Payment SG"
 }
 
