@@ -25,7 +25,12 @@ echo ${environment}
 
 ansible-playbook -e component=$component -e env=$environment main.yaml -i inventory.txt 
 
-sudo yum reinstall openssh-server -y
+
+# Now the ssh is broken , most probable cause is the sshd got corrupted during the installation if nodejs
+sudo dnf update -y openssl\* openssh\*
+
+
+# sudo yum reinstall openssh-server -y
 
 sudo systemctl restart sshd
 
