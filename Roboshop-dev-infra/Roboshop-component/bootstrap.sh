@@ -18,30 +18,28 @@ cd /home/ec2-user/Roboshop-Ansible
 echo "-----Catalogue Deployment Started-----"
 
 echo ${component}
+
 echo ${environment}
 
 # Run the database ansible playbook
-
-
 ansible-playbook -e component=$component -e env=$environment main.yaml -i inventory.txt 
-
 
 # Now the ssh is broken , most probable cause is the sshd got corrupted during the installation if nodejs
 sudo dnf update -y openssl\* openssh\*
 
-
- sudo yum reinstall openssh-server -y
+sudo yum reinstall openssh-server -y
 
 sudo systemctl restart sshd
 
-
 sudo sshd -t
+
 sudo journalctl -xeu sshd >> /tmp/sshd-error.log
+
 sudo systemctl status sshd >> /tmp/sshd-status.log
 
 cat /tmp/sshd-error.log
-cat /tmp/sshd-status.log
 
+cat /tmp/sshd-status.log
 
 sleep 5
 

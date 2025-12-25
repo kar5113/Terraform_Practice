@@ -3,6 +3,8 @@
 # in terraform infra dev folder, move into all the folders and run terraform apply -auto-approve
  
 host = $1
+
+
  for dir in $(ls -d */); do
        if [ "$dir" == "40-databases/" ] || [ "$dir" == "60-catalogue/" ]; then
                if [ "$host" == "mac" ]; then
