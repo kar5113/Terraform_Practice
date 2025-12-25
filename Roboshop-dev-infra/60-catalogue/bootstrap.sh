@@ -29,6 +29,9 @@ sudo yum reinstall openssh-server -y
 
 sudo systemctl restart sshd
 
+sudo systemctl status sshd
+sudo journalctl -xeu sshd
+
 sleep 5
 
 exit 0
