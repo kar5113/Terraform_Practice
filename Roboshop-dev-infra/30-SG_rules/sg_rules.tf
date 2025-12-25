@@ -130,6 +130,17 @@ resource "aws_security_group_rule" "catalogue-bastion" {
   description       = "Allow Catalogue traffic from bastion to Catalogue SG"
 }
 
+# frontend from bastion ssh connection on port 22
+resource "aws_security_group_rule" "frontend-bastion" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  source_security_group_id= local.bastion_sg_id
+  security_group_id = local.frontend_sg_id
+  description       = "Allow Frontend traffic from bastion to Frontend SG"  
+}
+
 # catalogue from bastion http connection on port 80
 resource "aws_security_group_rule" "catalogue-bastion-http" {
   type              = "ingress"
