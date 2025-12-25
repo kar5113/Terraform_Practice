@@ -228,16 +228,5 @@ resource "terraform_data" "catalogue_local" {
   }
 }
 
-# create a target group for catalogue service
 
-
-
-
-# stop the instance and create an ami from it.
-
-# Create a launch template using that ami
-
-# create a target group for catalogue service
-
-# Use that launch template in the autoscaling group for catalogue service and attach the target group to it.
 
