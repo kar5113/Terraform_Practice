@@ -35,12 +35,14 @@ if [ ! -d Terraform_Practice ]; then
   git clone https://github.com/kar5113/Terraform_Practice.git
 fi  
 
-cd /home/ec2-user/Roboshop
+cd /home/ec2-user/Roboshop/Terraform-Roboshop/Roboshop-dev-infra
 
-# Cloning the Ansible_Roboshop repository
-if [ ! -d Ansible_Roboshop ]; then
-    git clone https://github.com/kar5113/Roboshop-Ansible.git
-fi
+
+
+# # Cloning the Ansible_Roboshop repository
+# if [ ! -d Ansible_Roboshop ]; then
+#     git clone https://github.com/kar5113/Roboshop-Ansible.git
+# fi
 
 
 
