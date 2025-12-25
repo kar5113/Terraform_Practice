@@ -186,6 +186,7 @@ resource "aws_route53_record" "mysql" {
 
 # or this can be done using data in ec2 resource, refer docker ec2 creation file or null resource
 resource "terraform_data" "mysql" {
+  depends_on = [ aws_iam_instance_profile.mysql ]
   triggers_replace = [
     aws_instance.mysql.id
   ]
