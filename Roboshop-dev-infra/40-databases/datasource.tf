@@ -19,3 +19,15 @@ data "aws_ssm_parameter" "vpc_id" {
 data "aws_ssm_parameter" "database_subnet_ids" {
   name = "/${var.project}/${var.environment}/database_subnet_ids"
 }
+
+data "aws_ssm_parameter" "redis_sg" {
+  name = "/${var.project}/${var.environment}/redis_sg_id"
+}
+
+data "aws_ssm_parameter" "mysql_sg" {
+  name = "/${var.project}/${var.environment}/mysql_sg_id"
+}
+
+data "aws_ssm_parameter" "rabbitmq_sg" {
+  name = "/${var.project}/${var.environment}/rabbitmq_sg_id"
+}
