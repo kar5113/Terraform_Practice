@@ -16,6 +16,7 @@ if [ -d Roboshop-Ansible ]; then
   git pull
 else
   git clone https://github.com/kar5113/Roboshop-Ansible.git
+  cd Roboshop-Ansible
 fi  
 
 # # clone the repository if not already present
@@ -23,7 +24,7 @@ fi
 #   git clone https://github.com/kar5113/Roboshop-Ansible.git
 # fi
 
-cd Roboshop-Ansible
+
 
 # Run the database ansible playbook
 
