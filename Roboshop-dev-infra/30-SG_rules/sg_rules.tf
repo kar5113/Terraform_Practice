@@ -376,6 +376,17 @@ resource "aws_security_group_rule" "frontend-alb-internet" {
   description       = "Allow internet to communicate with frontend ALB on port 443"
 }
 
+# Allow open_VPN to communicate with bastion on port 22
+resource "aws_security_group_rule" "bastion-open_VPN" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = local.open_VPN_sg_id
+  description       = "Allow open_VPN to communicate with bastion on port 22"
+}
+
 
 
 

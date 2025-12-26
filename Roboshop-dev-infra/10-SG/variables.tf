@@ -17,5 +17,7 @@ variable "sg_names"{
             
             "mongodb","mysql","redis","rabbitmq","bastion",
             
-            "frontend_alb", "backend_alb"]
+            "frontend_alb", "backend_alb",
+            
+            "open_VPN"]
 }
