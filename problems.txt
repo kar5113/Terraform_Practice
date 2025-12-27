@@ -1,0 +1,12 @@
+# This MD file lists problems faced during Terraform implementation for Roboshop project
+
+# Problems Faced During Terraform Implementation for Roboshop Project
+1. **SSM Parameter Retrieval Issues**:
+   - Faced challenges in retrieving SSM parameters using `data.aws_ssm_parameter`. Ensured correct parameter names and permissions.
+2. **Ansible Playbook Execution**:
+   - Encountered issues while executing Ansible playbooks from Terraform. Resolved by adding verbose logging and debugging options.
+
+   - The ansible command works fine when ran individualy , or with the shell script manually. But it works fine when ran through terraform provisioner. but the sshd service crashes after ansible 
+     playbook execution is done and will not be able to connect to the instance after that. Sometimes even the service doesnt work, for now restarting the sshd service at the end of script.
+     The issue could be memory related as the instance is t2.micro with 1GB RAM. and copilot suggested some chnages to ansible playbook like after copying the service file run the daemon reload
+     and then start the service, start the service in the actual component role not tbe common role. For the the service starts but sshd crashes.
