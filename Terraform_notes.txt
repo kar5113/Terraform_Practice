@@ -385,10 +385,212 @@ Now null resource is deprecated, terraform-data is the new name to achieve the s
 3. When a resource is tainted, Terraform will plan to destroy the existing resource and create a new one in its place.  
 4. The command requires the resource address as an argument to specify which resource to taint.
 5. After tainting a resource, you can run `terraform plan` to see the changes that will be made, followed by `terraform apply` to execute the plan and recreate the tainted resource.
+
+
+
+#### Terraform import
+1. The `terraform import` command is used to bring existing infrastructure resources under Terraform management by importing them into the Terraform state file.
+2. This command allows you to manage resources that were created outside of Terraform or in a different Terraform configuration.
+3. To use `terraform import`, you need to specify the resource address in your Terraform configuration and the unique identifier of the existing resource.
+4. After importing, you should run `terraform plan` to ensure that the imported resource matches the desired state defined in your configuration.
+5. The `terraform import` command does not create any configuration files; it only updates the state file to include the imported resource. You need to manually define the resource in your Terraform configuration to manage it going forward.
 ## Example:
 ```bash
-terraform taint aws_instance.example
+terraform import aws_instance.example i-1234567890abcdef0
 ```
+Then create a resource block in your configuration:
+```hcl
+resource "aws_instance" "example" {
+  # Define the resource attributes here
+  as manu as possible and match the existing resource and run terraform plan to verify
+}
+```
+
+#### Terraform state commands
+1. Terraform state commands are used to manage and manipulate the Terraform state file, which tracks the current state of your infrastructure.
+2. Common state commands include `terraform state list`, `terraform state show`, `terraform state mv`, `terraform state rm`, and `terraform state pull`.
+3. These commands allow you to view, modify, and manage resources in the state file without affecting the actual infrastructure.
+4. State commands are useful for advanced scenarios, such as renaming resources, removing resources from the state, or inspecting resource attributes.
+5. Proper management of the Terraform state is crucial for maintaining the integrity and consistency of your infrastructure deployments.
+## Examples:
+- `terraform state list`: Lists all resources in the current state file.
+- `terraform state show <resource_address>`: Displays detailed information about a specific resource in the state file.
+- `terraform state mv <source> <destination>`: Moves a resource from one address to another within the state file.
+- `terraform state rm <resource_address>`: Removes a resource from the state file without destroying the actual resource.
+- `terraform state pull`: Retrieves the current state file from the remote backend and outputs it to stdout.
+
+
+#### Terraform lifecycle:
+1. The `lifecycle` block in Terraform allows you to customize the behavior of resource creation, update, and deletion.
+2. It provides arguments such as `create_before_destroy`, `prevent_destroy`, and `ignore_changes` to control how resources are managed during the Terraform lifecycle.
+3. The `create_before_destroy` argument ensures that a new resource is created before the old one is destroyed, minimizing downtime.
+4. The `prevent_destroy` argument prevents a resource from being destroyed, adding an extra layer of safety against accidental deletions.
+5. The `ignore_changes` argument allows you to specify resource attributes that should be ignored during updates, preventing unnecessary changes to the resource.
+
+While using these lifecycle blocks , its important to note the dependencies between resources to avoid conflicts or unintended consequences during the apply phase.
+
+
+#### Terraform target:
+1. The `-target` option in Terraform allows you to focus the execution of `terraform plan` or `terraform apply` on specific resources or modules.
+2. By specifying the `-target` flag followed by the resource address, you can limit the scope of the operation to only the targeted resources.
+3. This is useful for scenarios where you want to apply changes to a specific resource without affecting the rest of the infrastructure.
+4. The `-target` option can help speed up the execution time by reducing the number of resources that need to be evaluated and modified.
+5. However, using `-target` should be done with caution, as it can lead to inconsistencies in the overall state if dependencies are not properly managed.
+## Example:
+```bash
+terraform apply -target=aws_instance.example
+```
+````bash
+terraform destroy -target=aws_instance.example
+```
+Using this too, make a note of dependencies between resources to avoid conflicts or unintended consequences during the apply or destroy phase.
+
+#### Terraform workspaces
+1. Terraform workspaces allow you to manage multiple instances of a single Terraform configuration, enabling the creation of separate environments (e.g., dev, staging, prod) within the same configuration.
+2. Each workspace has its own state file, allowing you to isolate changes and manage resources independently across different environments.
+3. Workspaces can be created, selected, and deleted using the `terraform workspace`
+
+Refer above section "How to create multiple environments using terraform" for more details on workspaces and commands.
+
+
+#### Terraform CLI commands
+1. `terraform init`: Initializes a Terraform working directory by downloading necessary provider plugins and setting up the backend.
+2. `terraform plan`: Creates an execution plan, showing the changes that will be made to the infrastructure without applying them.
+3. `terraform apply`: Applies the changes required to reach the desired state of the configuration.
+4. `terraform destroy`: Destroys all resources managed by the current Terraform configuration.
+5. `terraform validate`: Validates the syntax and structure of the Terraform configuration files.
+6. `terraform fmt`: Formats the Terraform configuration files to follow standard conventions.
+7. `terraform show`: Displays the current state or a plan in a human-readable format.
+8. `terraform output`: Retrieves the values of output variables from the state file.
+9. `terraform graph`: Generates a visual representation of the resource dependencies in the configuration.
+10. `terraform import`: Imports existing infrastructure resources into Terraform management.
+11. `terraform taint`: Marks a resource as tainted, forcing its recreation on the next apply.
+12. `terraform state`: Manages the Terraform state file with various subcommands for listing, showing, moving, and removing resources.
+13. `terraform workspace`: Manages multiple workspaces for different environments within the same configuration.
+14. `terraform providers`: Lists the providers required by the configuration and their versions.
+15. `terraform version`: Displays the current version of Terraform installed.
+16. `terraform refresh`: Updates the state file to reflect the current state of the infrastructure without making any changes.
+17. `terraform console`: Opens an interactive console for evaluating expressions and testing configurations.
+18. `terraform login`: Authenticates with the Terraform Cloud or Enterprise to manage remote state.
+19. `terraform logout`: Logs out from Terraform Cloud or Enterprise.
+20. `terraform state pull`: Retrieves the current state file from the remote backend and outputs it to stdout.
+21. `terraform state push`: Manually uploads a local state file to the remote backend.
+22. `terraform workspace list`: Lists all available workspaces in the current configuration.
+23. `terraform workspace select <workspace_name>`: Switches to the specified workspace.
+24. `terraform workspace new <workspace_name>`: Creates a new workspace with the specified name.
+25. `terraform workspace delete <workspace_name>`: Deletes the specified workspace. 
+26. `terraform plan -target=<resource_address>`: Creates an execution plan focused on the specified resource.
+27. `terraform apply -target=<resource_address>`: Applies changes only to the specified resource.
+28. `terraform destroy -target=<resource_address>`: Destroys only the specified resource
+29. `terraform fmt -recursive`: Formats all Terraform configuration files in the current directory and its subdirectories.
+30. `terraform validate -json`: Validates the configuration and outputs the results in JSON format
+
+
+
+#### Working with multiple providers in Terraform
+1. Terraform allows you to work with multiple providers within a single configuration by defining each provider with a unique alias.
+2. You can specify different configurations for each provider, such as different regions, credentials, or endpoints.
+3. To use multiple providers, you need to define each provider block with an `alias` argument and reference the aliased provider in the resource blocks.
+4. This feature is useful for managing resources across different cloud platforms or accounts within the same Terraform configuration.
+5. Proper management of provider configurations and aliases is essential to avoid conflicts and ensure that resources are created in the correct context.
+## Example:
+```hcl
+provider "aws" {
+  region = "us-east-1"
+  alias  = "us_east_1"
+}
+provider "aws" {
+  region = "us-west-2"
+  alias  = "us_west_2"
+}
+resource "aws_instance" "example_east" {
+  provider      = aws.us_east_1
+  ami           = var.ami-id
+  instance_type = "t3.micro"
+  tags = {
+    Name = "example-east-instance"
+  }
+}
+resource "aws_instance" "example_west" {
+  provider      = aws.us_west_2
+  ami           = var.ami-id
+  instance_type = "t3.micro"
+  tags = {
+    Name = "example-west-instance"
+  }
+}
+```
+The alias is the attribute that helps to differentiate between multiple provider configurations of the same type. 
+While adding multiple accounts for the same provider, make sure to use different aliases for each account to avoid conflicts.
+It can be done by giving different profile names in the provider block for each account.
+```hcl
+provider "aws" {
+  profile = "account1-profile"
+  region  = "us-east-1"
+  alias   = "account1"
+}
+provider "aws" {
+  profile = "account2-profile"
+  region  = "us-west-2"
+  alias   = "account2"
+}
+```
+While adding credentials , follow
+aws configure --profile <profile_name> and then provide the access key , secret key and region details.
+
+alias is to idesntify different provider configurations of the same type within a single Terraform configuration. This is like a variable name for the provider configuration.
+profile is to specify different sets of credentials for accessing the provider's services, typically used for managing multiple accounts or roles within the same provider.
+
+You can use variables or locals to manage provider configurations dynamically based on the environment or other factors.
+and share those variables across multiple provider blocks to maintain consistency and reduce redundancy. 
+## Example:
+```hcl
+variable "aws_region" {
+  description = "AWS region to deploy resources"
+  type        = string
+  default     = "us-east-1"
+}
+provider "aws" {
+  region = var.aws_region
+  alias  = "default"
+  profile = var.aws_region == "us-east-1" ? "account1-profile" : "account2-profile"
+}
+provider "aws" {
+  region = var.aws_region == "us-east-1" ? "us-west-2" : "us-east-1"
+  alias  = "secondary"
+  profile = var.aws_region == "us-east-1" ? "account2-profile" : "account1-profile"
+}
+```
+And share variables, locals or data sources across multiple resources with different providers to maintain consistency and reduce redundancy.
+## Example:
+```hcl
+variable "instance_type" {
+  description = "Type of AWS instance"
+  type        = string
+  default     = "t3.micro"
+}
+resource "aws_instance" "example_default" {
+  provider      = aws.default
+  ami           = var.ami-id
+  instance_type = var.instance_type
+  tags = {
+    Name = "example-default-instance"
+  }
+}
+resource "aws_instance" "example_secondary" {
+  provider      = aws.secondary
+  ami           = aws_instance.example_default.ami
+  instance_type = var.instance_type
+  tags = {
+    Name = "example-secondary-instance"
+  }
+}
+
+
+
+
+
+
 
 
 

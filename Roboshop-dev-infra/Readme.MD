@@ -53,6 +53,14 @@ Next process with adding SG rules and creating database resources.
 This module adds necessary rules to the security groups created in 10-SG module.
 - Add a rule to allow ssh from internet or specific ip to bastion SG.
 - Add a rule to allow ssh from bastion SG to all other SGs except frontend stuff.
+- all backend services, frontend must have a rule to allow http to backend load balancer SG.
+- frontend must have a rule to allow http to frontend load balancer SG.
+- all backend services must have a rule to allow http from backend load balancer SG.
+- mongodb SG must have a rule to allow mongodb port from catalogue and user SGs.
+- mysql SG must have a rule to allow mysql port from cart, shipping SGs
+- redis SG must have a rule to allow redis port from cart,user SG.
+- rabbitmq SG must have a rule to allow amqp port from payment SG.
+- SG rules are added following least privilege principle.
 
 
 
@@ -62,5 +70,92 @@ This module creates all the database resources required for the Roboshop applica
 - Create a mysql instance in database subnet.
 - Create a redis cluster in database subnet.
 - Create a rabbitmq instance in database subnet.
+
+Use the ansible playbooks for their configuration after the instances are created.
+- Database endpoints are outputted to ssm parameter store for other modules to use.
+- mysql must require access from ssm parameter to read the password for the mysql root user.
+
+## 50-Backend load balancer:
+This module creates a load balancer for the backend of Roboshop application.
+- Create an application load balancer in private subnets for backend services.
+- create a basic default listener on port 80. 
+- DNS record is also created in route53 for the load balancers.
+
+## 60-catalogue:
+This module creates the catalogue service resources for the Roboshop application.
+This module is the first backend service, so it was created for just test purpose.
+
+Create a module from this and use that moduole to create all the other backend and frontend services.
+- Create an ec2 instance in private subnet with necessary SG.
+- Use user data to install and configure the service.( with remote exec from bastion and ansible playbook)
+- now stop the instance and create an ami from it.
+- now create a launch template from the ami.
+- now create a target group with service port as 8080 , with a health check path /health.
+- Now create autoscaling groups for all the services with min, max, desired counts. use launch template and target groups created above.
+- create an instance refresh as well to update the instances in the autoscaling group whenever there is a change in launch template.
+- Then create a scaling policy to scale up and down based on cpu utilization.
+- Now add  listener rules to the already created basic listener with path based routing.
+- Use host header. For example catalogue-dev.kardev.space -> catalogue TG with a priority 10 or any unique value. Similarly add a rule for all the other services.
+- Now the original instance can be deleted as the autoscaling group will take care of creating and managing the instances.
+- Service endpoints are outputted to ssm parameter store for other modules to use.
+
+## 70-acm:
+This module creates an acm certificate for the roboshop application.
+- Create a certificate for *.dev.kardev.space in us-east-1 region as the cloudfront requires the certificate to be in us-east-1 region.
+- Use dns validation for the certificate.
+- Create a route53 record for the validation.
+
+## 80-Frontend load balancer:
+This module creates a load balancer for the frontend of Roboshop application.
+- Create an application load balancer in public subnets for frontend service.
+- create a basic default listener on port 80. 
+- create another listener on port 443 with the acm certificate created in 70-acm module.
+- create a redirect rule from http to https in port 80 listener.
+
+
+## 90-Components:
+This module creates the all service resources for the Roboshop application. This is an actual module to create all the services.
+Create a module from 60-catalogue and use that moduole to create all the other backend and frontend services.
+- Create an ec2 instance in private subnet with necessary SG.
+- Use user data to install and configure the service.( with remote exec from bastion and ansible playbook)
+- now stop the instance and create an ami from it.
+- now create a launch template from the ami.
+- now create a target group with service port as 8080 for backend services and 80 for frontend service.
+- include health checks in the target group.
+- Now create autoscaling groups for all the services with min, max, desired counts. use launch template and target groups created above.
+- create an instance refresh as well to update the instances in the autoscaling group whenever there is a change in launch template.
+- Then create a scaling policy to scale up and down based on cpu utilization.
+- Now add  listener rules to the already created basic listener with path based routing.
+- Use host header. For example catalogue-dev.kardev.space -> catalogue TG with a priority 10 or any unique value. Similarly add a rule for all the other services.
+- For. frontend service, create a separate frontend load balancer module and add listener rule for frontend service with frontend target group on port 80.
+- Now the original instance can be deleted as the autoscaling group will take care of creating and managing the instances.
+- Service endpoints are outputted to ssm parameter store for other modules to use.
+
+
+
+
+
+While adding credentials , follow
+ aws configure --profile <profile_name> and then provide the access key , secret key and region details.
+
+
+
+ The actual flow is :
+
+   1. Create a VPC using 00-VPC module.
+   2. Create security groups using 10-SG module.
+   3. Create a bastion host using 20-Bastion module.
+   4. Add security group rules using 30-SG rules module.
+   5. Create database resources using 40-Databases module.
+   6. Create backend load balancer using 50-Backend load balancer module.
+   7. Create a certificate using 70-acm module.
+   8. Create frontend load balancer using 80-Frontend load balancer module.
+   9. Create all the service resources using 90-Components module.
+   10. A VPN can also be created for secure access to the VPC if required. use openvpn or aws vpn services for that.
+   11. A CDN can also be created in front of frontend load balancer for better performance. use cloudfront for that.
+
+Finally , the roboshop application environment is ready with all the necessary resources created using terraform.
+
+
 
 
