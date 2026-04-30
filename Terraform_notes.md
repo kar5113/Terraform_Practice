@@ -1,37 +1,51 @@
-Terraform notes
+# Terraform notes
 
-##### Terraform Variables
+## Terraform Variables
 1. Variables in Terraform can be defined using the `variable` block and can be referenced using `var.<variable_name>`.
 2. Variables can have default values, descriptions, and types (string, number, bool, list, map, etc.).
 3. Variables can be overridden using command-line flags, environment variables, or `.tfvars` files.
 4. Using variables enhances the reusability and flexibility of Terraform configurations.
 5. To get the variables input from the user during runtime, we can define variables without default values.
+
 Example:
-```hcl
+```hcl 
 variable "sg_name" {
   description = "Name of the security group"
   type        = string
 }
-##
+```
+
 using commmand line  example:
+```sh
 terraform apply -var="sg_name=custom-sg" -var="sg_port=8080" -var='sg_cidr=["0.0.0.0/0"]'
-##
+```
+
 using tfvars file example:
+
 Create a file named `custom.tfvars` with the following content:
+```
 sg_name = "custom-sg"
 sg_port = 8080
 sg_cidr = ["0.0.0.0/0"]
+```
 Then run:
+```sh
 terraform apply -var-file="custom.tfvars"
-## 
+```
+
 using environment variables example:
+
 Set environment variables with the `TF_VAR_` prefix:
+```
 export TF_VAR_sg_name="custom-sg"
 export TF_VAR_sg_port=8080
 export TF_VAR_sg_cidr='["0.0.0.0/0"]'
+```
 Then run:
+```
 terraform apply 
-##
+```
+
 the order of precedence for variable values is:
 1. Command-line flags
 2. Environment variables
@@ -39,13 +53,14 @@ the order of precedence for variable values is:
 4. Default values in the configuration
 5. Prompted input during runtime
 
-#### Terraform conditions
+## Terraform conditions
 
 1. Terraform supports conditional expressions using the `condition ? true_value : false_value` syntax.
 2. Conditional expressions can be used to set variable values, resource attributes, and module inputs based on certain conditions.
 3. This allows for dynamic configurations that can adapt based on the environment or other factors.
 4. Conditional expressions can be nested for more complex logic.
-## Example:
+
+ Example:
 ```hcl
 variable "environment" {
   description = "The deployment environment"
@@ -61,12 +76,13 @@ resource "aws_instance" "example" {
 }
 ```
 
-#### Terraform loops
+## Terraform loops
 1. Terraform supports looping constructs using `for` expressions and `count` meta-argument.
 2. `for` expressions can be used to create lists or maps by iterating over collections.
 3. The `count` meta-argument allows for the creation of multiple instances of a resource based on a specified number.
 4. Loops enhance the ability to manage multiple similar resources efficiently.
-## Example using `count` expression:
+
+Example using `count` expression:
 ```hcl
 variable "instance_names" {
   description = "List of instance names"
@@ -82,7 +98,7 @@ resource "aws_instance" "example" {
   }
 }
 ```
-## Example using `for` expression:
+Example using `for` expression:
 ```hcl
 variable "instance_ports" {
   description = "List of instance ports"
@@ -111,7 +127,7 @@ resource "aws_security_group" "example" {
   ]
 }
 ```
-## Example for each loop: it if for both map and set 
+Example `for_each` loop: it is for both map and set 
 ```hcl
 variable "instance_map" {
   description = "Map of instance names to AMI IDs"
@@ -158,13 +174,14 @@ resource "aws_instance" "example" {
 ```
 
 
-#### Functions in Terraform
+## Functions in Terraform
 1. Terraform provides a variety of built-in functions that can be used to manipulate data and perform operations within configurations.
 2. Functions can be used for string manipulation, numeric calculations, type conversions, collection operations, and more.
 3. Functions enhance the flexibility and dynamism of Terraform configurations by allowing for complex logic and data transformations.
 4. Functions are called using the syntax `function_name(arguments)`.
 5. Functions can be nested to perform multiple operations in a single expression.
-## Example:
+
+Example:
 ```hcl
 variable "instance_name" {
   description = "Name of the instance"
@@ -191,23 +208,17 @@ various commonly used functions:
 - `lookup(map, key, default)`: Retrieves a value from a map by key, with an optional default if the key does not exist. ex: lookup({key1="value1", key2="value2"}, "key1", "default") => "value1"
 - `concat(list1, list2, ...)`: Concatenates multiple lists into a single list. ex: concat(["a", "b"], ["c", "d"]) => ["a", "b", "c", "d"]
 - `format(string, args...)`: Formats a string using the specified arguments.  ex: format("Hello, %s!", "World") => "Hello, World!"
-- `coalesce(value1, value2, ...)`: Returns the first non-null value from the provided arguments.  data "aws_ami" "ami" {
+- `coalesce(value1, value2, ...)`: Returns the first non-null value from the provided arguments. 
 - `merge(map1, map2, ...)`: Merges multiple maps into a single map. ex: merge({key1="value1"}, {key2="value2"}) => {key1="value1", key2="value2"}  
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-}
+ 
 
-
-#### Remote state with s3 backend
+## Remote state with s3 backend
 1. Remote state in Terraform allows you to store the state file in a remote location, enabling collaboration and state sharing among team members.  
 2. The S3 backend is a popular choice for remote state storage, providing durability, availability, and access control.
 3. To configure the S3 backend, you need to specify the `backend "s3"` block in your Terraform configuration, providing details such as the S3 bucket name, key (path to the state file), region, and optional settings like encryption and locking.
 4. Using remote state helps prevent conflicts and ensures that all team members are working with the most up-to-date state information.
-## Example:
+
+Example:
 ```hcl
 terraform {
   required_providers {
@@ -224,15 +235,38 @@ terraform {
     use_lockfile = true
    }
 }
+```
 
+Previously, we used dynamo db to lock th state file, for that
+```hcl
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.22.1"
+    }
+  }
+   backend "s3" {
+    bucket    = "your-remote-state-bucket"
+    key       = "path/to/your/terraform.tfstate"
+    region    = "us-east-1"
+    encrypt   = true
+    dynamodb_table = "your-lock-table"
+   }
+}
+``` 
+and the dynamo db table should have a primary key named "LockID" of type string to manage the locks for the state file. it looks like this:
+```LockID (string) - Primary Key
+``` 
 
-#### Terraform Locals
+## Terraform Locals
 1. Locals in Terraform allow you to define named values that can be reused throughout your configuration.
 2. They are defined using the `locals` block and can contain expressions, calculations, or static values.
 3. Locals enhance the readability and maintainability of Terraform configurations by reducing redundancy and simplifying complex expressions.
 4. Locals are evaluated only once per configuration and can be referenced using the `local.<local_name>` syntax.
 5. They are useful for defining commonly used values, intermediate calculations, or complex expressions that need to be reused.
-## Example:
+
+Example:
 ```hcl
 locals {  
   instance_name = "terraform-example-instance"
@@ -254,13 +288,14 @@ loals vs variables:
 - Variables cannot reference locals, but locals can reference variables. and locals cannot reference other locals. and variables cannot reference other variables.
 
 
-##### Dynamic blocks in Terraform
+### Dynamic blocks in Terraform
 1. Dynamic blocks in Terraform allow you to generate multiple nested blocks within a resource or module based on a collection of values.
 2. They are defined using the `dynamic` block and can iterate over lists or maps to create multiple instances of a block.
 3. Dynamic blocks enhance the flexibility and reusability of Terraform configurations by allowing for variable-length configurations.
 4. They are useful for scenarios where the number of nested blocks is not known in advance or can vary based on input data.
 5. Dynamic blocks can include `for_each` and `content` arguments to define the iteration and the content of the generated blocks.
-## Example:
+
+Example:
 ```hcl
 resource "aws_security_group" "example" {
   name        = "example-sg"
@@ -287,7 +322,7 @@ resource "aws_security_group" "example" {
 ```
 
 
-#### Provisioners in Terraform
+## Provisioners in Terraform
 1. Provisioners in Terraform allow you to execute scripts or commands on the target resource after it has been created or before it is destroyed.
 2. They are defined using the `provisioner` block within a resource and can use different types of provisioners such as `local-exec`, `remote-exec`, `file` and others.
 3. Provisioners are useful for performing configuration tasks, installing software, or running custom scripts on the resource.
@@ -296,7 +331,8 @@ resource "aws_security_group" "example" {
 6. They require proper connection settings to access the target resource, such as SSH or WinRM for remote-exec provisioners.
 7. It is recommended to use configuration management tools (like Ansible, Chef, Puppet) for complex provisioning tasks instead of relying heavily on Terraform provisioners.
 8. The self object can be used within provisioners to reference attributes of the resource being provisioned.
-## Example:
+
+Example:
 ```hcl
 resource "aws_instance" "example" {
   ami           = var.ami-id
@@ -318,26 +354,28 @@ resource "aws_instance" "example" {
 
 ## How to create multiple environments using terraform:
 1. To create multiple environments in Terraform, you can use workspaces, directory structures, or separate state files.
-2. sing .tfvars files for each environment to manage different configurations.
+2. Using .tfvars files for each environment to manage different configurations.
 3. You can also use modules to encapsulate common infrastructure components and reuse them across different environments
 
-  # Refer the terrafoem-multi-env folder for working with multople env using tfvars files and directory structure.
-  # or use Terraform workspaces to manage multiple environments within a single configuration.
+  Refer the terrafoem-multi-env folder for working with multople env using tfvars files and directory structure.
+  or use Terraform workspaces to manage multiple environments within a single configuration.
+      
       Terraform workspace commands:
       - terraform workspace new <workspace_name>  # Create a new workspace
       - terraform workspace select <workspace_name>  # Switch to an existing workspace
       - terraform workspace list  # List all workspaces
       - terraform workspace show  # Show the current workspace
       - terraform workspace delete <workspace_name>  # Delete a workspace
-  # Create a new workspace for each environment (e.g., dev, staging, prod) and manage state files separately for each workspace.
-  # now you can use terraform.workspace in the variables , look for local.tf, variables.tf file in terraform-multiple-env folder for example.    
-  # terraform.workspace can be used to dynamically set values based on the current workspace. it gives the workspace name and the remote state will be stored in separate files for each workspace.
+  
+  Create a new workspace for each environment (e.g., dev, staging, prod) and manage state files separately for each workspace.
+  now you can use terraform.workspace in the variables , look for local.tf, variables.tf file in terraform-multiple-env folder for example.    
+  terraform.workspace can be used to dynamically set values based on the current workspace. it gives the workspace name and the remote state will be stored in separate files for each workspace.
 4. By following these practices, you can effectively manage multiple environments in Terraform while maintaining consistency and reusability across your infrastructure configurations.
 
 or Maintain different repos for each environment and modules to avoid code duplication.
 
 
-#### Terraform modules.
+## Terraform modules.
 1. Modules in Terraform are reusable, self-contained packages of Terraform configurations that can be used to encapsulate and manage related resources.
 2. They allow you to organize your infrastructure code into logical components, making it easier to manage, reuse, and share.
 3. Modules can be created locally within your project or sourced from external repositories, such as the Terraform Registry or GitHub.
@@ -347,9 +385,9 @@ or Maintain different repos for each environment and modules to avoid code dupli
 
 ---- Refer the terraform-module-dev folder for example module implementation. ----
 
-#### any changes made in the module will reflect everywhere the module is used. but needs to be re initialized using terraform init command again in the root module where it is used.
+ any changes made in the module will reflect everywhere the module is used. but needs to be re initialized using terraform init command again in the root module where it is used.
 
-    ## Advantages of using modules:
+#### Advantages of using modules:
   1. Code Reusability: Modules allow you to reuse code across different projects and environments, reducing duplication and promoting consistency.
   2. Simplified Management: By encapsulating related resources, modules make it easier to manage and maintain complex infrastructure configurations.
   3. Improved Organization: Modules help organize your Terraform code into logical components, making it easier to understand and navigate.
@@ -361,13 +399,14 @@ or Maintain different repos for each environment and modules to avoid code dupli
 
 
 
-### Null resource in terraform
+## Null resource in terraform
 1. The `null_resource` in Terraform is a special resource type that does not create any actual infrastructure but can be used to trigger provisioners or manage dependencies.
 2. It is often used for running scripts, executing commands, or managing resources that are not directly supported by Terraform.
 3. The `null_resource` can be useful for tasks such as bootstrapping, configuration management, or orchestrating actions that need to occur during the Terraform lifecycle.
 4. It can be configured with provisioners like `local-exec` or `remote-exec` to run commands on the local machine or remote instances.
 5. The `null_resource` can also be used to create dependencies between resources by using the `depends_on` argument.
-## Example:
+
+Example:
 ```hcl
 resource "null_resource" "example" {
   provisioner "local-exec" {
@@ -388,13 +427,14 @@ Now null resource is deprecated, terraform-data is the new name to achieve the s
 
 
 
-#### Terraform import
+## Terraform import
 1. The `terraform import` command is used to bring existing infrastructure resources under Terraform management by importing them into the Terraform state file.
 2. This command allows you to manage resources that were created outside of Terraform or in a different Terraform configuration.
 3. To use `terraform import`, you need to specify the resource address in your Terraform configuration and the unique identifier of the existing resource.
 4. After importing, you should run `terraform plan` to ensure that the imported resource matches the desired state defined in your configuration.
 5. The `terraform import` command does not create any configuration files; it only updates the state file to include the imported resource. You need to manually define the resource in your Terraform configuration to manage it going forward.
-## Example:
+
+Example:
 ```bash
 terraform import aws_instance.example i-1234567890abcdef0
 ```
@@ -402,17 +442,18 @@ Then create a resource block in your configuration:
 ```hcl
 resource "aws_instance" "example" {
   # Define the resource attributes here
-  as manu as possible and match the existing resource and run terraform plan to verify
+  # as many as possible and match the existing resource and run terraform plan to verify
 }
 ```
 
-#### Terraform state commands
+## Terraform state commands
 1. Terraform state commands are used to manage and manipulate the Terraform state file, which tracks the current state of your infrastructure.
 2. Common state commands include `terraform state list`, `terraform state show`, `terraform state mv`, `terraform state rm`, and `terraform state pull`.
 3. These commands allow you to view, modify, and manage resources in the state file without affecting the actual infrastructure.
 4. State commands are useful for advanced scenarios, such as renaming resources, removing resources from the state, or inspecting resource attributes.
 5. Proper management of the Terraform state is crucial for maintaining the integrity and consistency of your infrastructure deployments.
-## Examples:
+
+Examples:
 - `terraform state list`: Lists all resources in the current state file.
 - `terraform state show <resource_address>`: Displays detailed information about a specific resource in the state file.
 - `terraform state mv <source> <destination>`: Moves a resource from one address to another within the state file.
@@ -420,7 +461,7 @@ resource "aws_instance" "example" {
 - `terraform state pull`: Retrieves the current state file from the remote backend and outputs it to stdout.
 
 
-#### Terraform lifecycle:
+## Terraform lifecycle:
 1. The `lifecycle` block in Terraform allows you to customize the behavior of resource creation, update, and deletion.
 2. It provides arguments such as `create_before_destroy`, `prevent_destroy`, and `ignore_changes` to control how resources are managed during the Terraform lifecycle.
 3. The `create_before_destroy` argument ensures that a new resource is created before the old one is destroyed, minimizing downtime.
@@ -430,27 +471,31 @@ resource "aws_instance" "example" {
 While using these lifecycle blocks , its important to note the dependencies between resources to avoid conflicts or unintended consequences during the apply phase.
 
 
-#### Terraform target:
+## Terraform target:
 1. The `-target` option in Terraform allows you to focus the execution of `terraform plan` or `terraform apply` on specific resources or modules.
 2. By specifying the `-target` flag followed by the resource address, you can limit the scope of the operation to only the targeted resources.
 3. This is useful for scenarios where you want to apply changes to a specific resource without affecting the rest of the infrastructure.
 4. The `-target` option can help speed up the execution time by reducing the number of resources that need to be evaluated and modified.
 5. However, using `-target` should be done with caution, as it can lead to inconsistencies in the overall state if dependencies are not properly managed.
-## Example:
-```bash
-terraform apply -target=aws_instance.example
-```
-````bash
-terraform destroy -target=aws_instance.example
-```
+
+Example:
+
+- terraform apply -target=aws_instance.example
+
+
+- terraform destroy -target=aws_instance.example
+
 Using this too, make a note of dependencies between resources to avoid conflicts or unintended consequences during the apply or destroy phase.
 
-#### Terraform workspaces
+
+## Terraform workspaces:
 1. Terraform workspaces allow you to manage multiple instances of a single Terraform configuration, enabling the creation of separate environments (e.g., dev, staging, prod) within the same configuration.
 2. Each workspace has its own state file, allowing you to isolate changes and manage resources independently across different environments.
 3. Workspaces can be created, selected, and deleted using the `terraform workspace`
 
 Refer above section "How to create multiple environments using terraform" for more details on workspaces and commands.
+
+
 
 
 #### Terraform CLI commands
@@ -487,7 +532,7 @@ Refer above section "How to create multiple environments using terraform" for mo
 
 
 
-#### Working with multiple providers in Terraform
+## Working with multiple providers in Terraform
 1. Terraform allows you to work with multiple providers within a single configuration by defining each provider with a unique alias.
 2. You can specify different configurations for each provider, such as different regions, credentials, or endpoints.
 3. To use multiple providers, you need to define each provider block with an `alias` argument and reference the aliased provider in the resource blocks.
@@ -536,14 +581,18 @@ provider "aws" {
 }
 ```
 While adding credentials , follow
+
 aws configure --profile <profile_name> and then provide the access key , secret key and region details.
 
-alias is to idesntify different provider configurations of the same type within a single Terraform configuration. This is like a variable name for the provider configuration.
+alias is to identify different provider configurations of the same type within a single Terraform configuration. This is like a variable name for the provider configuration.
+
 profile is to specify different sets of credentials for accessing the provider's services, typically used for managing multiple accounts or roles within the same provider.
 
 You can use variables or locals to manage provider configurations dynamically based on the environment or other factors.
+
 and share those variables across multiple provider blocks to maintain consistency and reduce redundancy. 
-## Example:
+
+Example:
 ```hcl
 variable "aws_region" {
   description = "AWS region to deploy resources"
@@ -562,7 +611,8 @@ provider "aws" {
 }
 ```
 And share variables, locals or data sources across multiple resources with different providers to maintain consistency and reduce redundancy.
-## Example:
+
+Example:
 ```hcl
 variable "instance_type" {
   description = "Type of AWS instance"
@@ -585,24 +635,3 @@ resource "aws_instance" "example_secondary" {
     Name = "example-secondary-instance"
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
