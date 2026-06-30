@@ -256,7 +256,8 @@ terraform {
 }
 ``` 
 and the dynamo db table should have a primary key named "LockID" of type string to manage the locks for the state file. it looks like this:
-```LockID (string) - Primary Key
+```
+LockID (string) - Primary Key
 ``` 
 
 ## Terraform Locals
@@ -635,3 +636,11 @@ resource "aws_instance" "example_secondary" {
     Name = "example-secondary-instance"
   }
 }
+```
+
+## Production practice folder
+1. Refer the `production-practice/` folder in this repo for app-only release practice.
+2. It assumes the shared infra is already present and focuses on app deployment, updates, traffic shifts, and rollbacks.
+3. The reusable app module accepts the key inputs only: app name, deployment type, deployment action, networking rules, and release AMIs.
+4. Start with `examples/rolling.tfvars.example`, then move to canary, blue/green, and rollback examples.
+5. Use the `pipelines/Jenkinsfile` template to see how these Terraform runs can be wired into CI.

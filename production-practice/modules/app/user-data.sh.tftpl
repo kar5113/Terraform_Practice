@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+
+APP_NAME="${app_name}"
+ENVIRONMENT="${environment}"
+DEPLOYMENT_TYPE="${deployment_type}"
+DEPLOYMENT_MODE="${deployment_mode}"
+RELEASE_NAME="${release_name}"
+APP_PORT="${container_port}"
+
+cat >/etc/profile.d/${app_name}.sh <<EOF
+export APP_NAME="${app_name}"
+export ENVIRONMENT="${environment}"
+export DEPLOYMENT_TYPE="${deployment_type}"
+export DEPLOYMENT_MODE="${deployment_mode}"
+export RELEASE_NAME="${release_name}"
+export APP_PORT="${container_port}"
+EOF
+
+echo "Placeholder bootstrap for ${app_name} (${release_name})" >/var/tmp/${app_name}-${release_name}.txt

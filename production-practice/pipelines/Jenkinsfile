@@ -1,0 +1,93 @@
+pipeline {
+  agent any
+
+  parameters {
+    // The build only needs a few user inputs; the rest comes from tfvars.
+    string(name: 'APP_NAME', defaultValue: 'catalogue', description: 'Application or microservice name')
+    choice(name: 'DEPLOYMENT_TYPE', choices: ['rolling', 'canary', 'bluegreen'], description: 'Release strategy')
+    choice(name: 'DEPLOYMENT_ACTION', choices: ['deploy', 'update', 'rollback'], description: 'Release action')
+    string(name: 'TFVARS_FILE', defaultValue: 'examples/rolling.tfvars.example', description: 'Terraform variables file')
+    string(name: 'ROLLBACK_AMI_ID', defaultValue: '', description: 'Previous AMI for rollback runs')
+  }
+
+  environment {
+    TF_IN_AUTOMATION = 'true'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Format') {
+      steps {
+        // Keep the example readable and consistent with Terraform style.
+        sh 'terraform -chdir=production-practice fmt -check -recursive'
+      }
+    }
+
+    stage('Init') {
+      steps {
+        // Re-download providers and modules before planning.
+        sh 'terraform -chdir=production-practice init'
+      }
+    }
+
+    stage('Validate') {
+      steps {
+        // Validate catches syntax and type issues before a plan runs.
+        sh 'terraform -chdir=production-practice validate'
+      }
+    }
+
+    stage('Plan') {
+      steps {
+        // A single command works for all release patterns because the tfvars file changes the behavior.
+        sh '''
+          terraform -chdir=production-practice plan \
+            -var-file="${TFVARS_FILE}" \
+            -var="app_name=${APP_NAME}" \
+            -var="deployment_type=${DEPLOYMENT_TYPE}" \
+            -var="deployment_action=${DEPLOYMENT_ACTION}" \
+            -var="rollback_ami_id=${ROLLBACK_AMI_ID}"
+        '''
+      }
+    }
+
+    stage('Apply') {
+      when {
+        expression { return params.DEPLOYMENT_ACTION != 'rollback' }
+      }
+      steps {
+        // Normal deploy and update paths use the same apply step.
+        sh '''
+          terraform -chdir=production-practice apply -auto-approve \
+            -var-file="${TFVARS_FILE}" \
+            -var="app_name=${APP_NAME}" \
+            -var="deployment_type=${DEPLOYMENT_TYPE}" \
+            -var="deployment_action=${DEPLOYMENT_ACTION}" \
+            -var="rollback_ami_id=${ROLLBACK_AMI_ID}"
+        '''
+      }
+    }
+
+    stage('Rollback Apply') {
+      when {
+        expression { return params.DEPLOYMENT_ACTION == 'rollback' }
+      }
+      steps {
+        // Rollback uses the previous AMI and the same Terraform module shape.
+        sh '''
+          terraform -chdir=production-practice apply -auto-approve \
+            -var-file="${TFVARS_FILE}" \
+            -var="app_name=${APP_NAME}" \
+            -var="deployment_type=${DEPLOYMENT_TYPE}" \
+            -var="deployment_action=${DEPLOYMENT_ACTION}" \
+            -var="rollback_ami_id=${ROLLBACK_AMI_ID}"
+        '''
+      }
+    }
+  }
+}

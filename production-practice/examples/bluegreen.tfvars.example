@@ -1,0 +1,21 @@
+# Blue/green release example: keep one environment active while preparing the other.
+app_name                = "catalogue"
+environment             = "prod"
+deployment_type         = "bluegreen"
+deployment_action       = "update"
+# Both AMIs exist at the same time so traffic can be flipped between them.
+app_ami_id              = "ami-0123456789abcdef0"
+secondary_ami_id        = "ami-0fedcba9876543210"
+instance_type           = "t3.micro"
+secondary_instance_type = "t3.micro"
+# active_target tells the module which target group should receive the traffic.
+active_target           = "secondary"
+vpc_id                  = "vpc-0123456789abcdef0"
+private_subnet_ids      = ["subnet-aaa111", "subnet-bbb222"]
+listener_arn            = "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/prod-alb/abcd1234/efgh5678"
+listener_priority       = 120
+host_header             = "catalogue.prod.example.com"
+container_port          = 8080
+health_check_path       = "/health"
+allowed_cidr_blocks     = ["10.0.0.0/16"]
+allowed_security_group_ids = ["sg-0123456789abcdef0"]

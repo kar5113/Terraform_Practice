@@ -1,0 +1,18 @@
+# Rolling release example: one active stack, refreshed in place.
+app_name                = "catalogue"
+environment             = "prod"
+deployment_type         = "rolling"
+deployment_action       = "update"
+# Current AMI used by the primary release track.
+app_ami_id              = "ami-0123456789abcdef0"
+instance_type           = "t3.micro"
+# Existing app network and routing inputs.
+vpc_id                  = "vpc-0123456789abcdef0"
+private_subnet_ids      = ["subnet-aaa111", "subnet-bbb222"]
+listener_arn            = "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/prod-alb/abcd1234/efgh5678"
+listener_priority       = 100
+host_header             = "catalogue.prod.example.com"
+container_port          = 8080
+health_check_path       = "/health"
+allowed_cidr_blocks     = ["10.0.0.0/16"]
+allowed_security_group_ids = ["sg-0123456789abcdef0"]
